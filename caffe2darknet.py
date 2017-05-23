@@ -5,6 +5,17 @@ def prototxt2cfg(protofile):
     blocks = []
     block = OrderedDict()
     block['type'] = 'net'
+    block['batch'] = '128'
+    block['subdivisions'] = '8'
+    block['height'] = '224'
+    block['width'] = '224'
+    block['channels'] = '256'
+    block['momentum'] = '0.9'
+    block['decay'] = '0.0001'
+    block['learning_rate'] = '0.05'
+    block['policy'] = 'poly'
+    block['power'] = '4'
+    block['max_batches'] = 500000
     blocks.append(block)
 
     net_info = parse_prototxt(protofile)
@@ -19,7 +30,7 @@ def prototxt2cfg(protofile):
             if layer_id[layer['bottom']] != len(blocks)-1:
                 block = OrderedDict()
                 block['type'] = 'route'
-                block['layers'] = layer_id[layer['bottom']] - len(blocks)
+                block['layers'] = str(layer_id[layer['bottom']] - len(blocks))
                 blocks.append(block)
             assert(i+1 < layer_num and layers[i+1]['type'] == 'BatchNorm')
             assert(i+2 < layer_num and layers[i+2]['type'] == 'Scale')
@@ -31,6 +42,7 @@ def prototxt2cfg(protofile):
             block['batch_normalize'] = '1'
             block['filters'] = conv_layer['convolution_param']['num_output']
             block['size'] = conv_layer['convolution_param']['kernel_size']
+            block['stride'] = conv_layer['convolution_param']['stride']
             block['pad'] = '1'
             if i+3 < layer_num and layers[i+3]['type'] == 'ReLU':
                 act_layer = layers[i+3]
@@ -48,9 +60,12 @@ def prototxt2cfg(protofile):
         elif layer['type'] == 'Pooling':
             assert(layer_id[layer['bottom']] == len(blocks)-1)
             block = OrderedDict()
-            block['type'] = 'maxpool'
-            block['size'] = layer['pooling_param']['kernel_size']
-            block['stride'] = layer['pooling_param']['stride']
+            if layer['pooling_param']['pool'] == 'AVE':
+                block['type'] = 'avgpool'
+            elif layer['pooling_param']['pool'] == 'MAX':
+                block['type'] = 'maxpool'
+                block['size'] = layer['pooling_param']['kernel_size']
+                block['stride'] = layer['pooling_param']['stride']
             top = layer['top']
             layer_id[top] = len(blocks)
             blocks.append(block)
@@ -60,7 +75,7 @@ def prototxt2cfg(protofile):
             bottom1 = layer_id[bottoms[0]] - len(blocks)
             bottom2 = layer_id[bottoms[1]] - len(blocks)
             assert(bottom1 == -1 or bottom2 == -1)
-            from_id = bottom1 if bottom1 == -1 else bottom2
+            from_id = bottom2 if bottom1 == -1 else bottom1
             block = OrderedDict()
             block['type'] = 'shortcut'
             block['from'] = str(from_id)
@@ -94,3 +109,4 @@ if __name__ == '__main__':
     import sys
     blocks = prototxt2cfg(sys.argv[1])
     print_cfg(blocks)
+    print_cfg_nicely(blocks)

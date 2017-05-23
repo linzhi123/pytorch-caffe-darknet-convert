@@ -84,20 +84,19 @@ def print_cfg_nicely(blocks):
         elif block['type'] == 'avgpool':
             width = 1
             height = 1
-            print('%5d %-6s                   %3d x %3d x%4d   ->  %3d' % (ind, 'avg', prev_width, prev_height, prev_filters,  prev_filters))
-            prev_width = width
-            prev_height = height
-            prev_filters = filters
+            print('%5d %-6s                   %3d x %3d x%4d   ->      %3d' % (ind, 'avg', prev_width, prev_height, prev_filters,  prev_filters))
+            prev_width = 1
+            prev_height = 1
             out_widths.append(prev_width)
             out_heights.append(prev_height)
             out_filters.append(prev_filters)
         elif block['type'] == 'softmax':
-            print('%5d %-6s                                    ->  %3d' % (ind, 'softmax', prev_filters))
+            print('%5d %-6s                                    ->      %3d' % (ind, 'softmax', prev_filters))
             out_widths.append(prev_width)
             out_heights.append(prev_height)
             out_filters.append(prev_filters)
         elif block['type'] == 'cost':
-            print('%5d %-6s                                     ->  %3d' % (ind, 'cost', prev_filters))
+            print('%5d %-6s                                     ->      %3d' % (ind, 'cost', prev_filters))
             out_widths.append(prev_width)
             out_heights.append(prev_height)
             out_filters.append(prev_filters)
@@ -135,6 +134,28 @@ def print_cfg_nicely(blocks):
             print('%5d %-6s' % (ind, 'detection'))
             out_widths.append(prev_width)
             out_heights.append(prev_height)
+            out_filters.append(prev_filters)
+        elif block['type'] == 'shortcut':
+            from_id = int(block['from'])
+            from_id = from_id if from_id > 0 else from_id+ind
+            print('%5d %-6s %d' % (ind, 'shortcut', from_id))
+            prev_width = out_widths[from_id]
+            prev_height = out_heights[from_id]
+            prev_filters = out_filters[from_id]
+            out_widths.append(prev_width)
+            out_heights.append(prev_height)
+            out_filters.append(prev_filters)
+        elif block['type'] == 'softmax':
+            print('%5d %-6s' % (ind, 'softmax'))
+            out_widths.append(prev_width)
+            out_heights.append(prev_height)
+            out_filters.append(prev_filters)
+        elif block['type'] == 'connected':
+            filters = int(block['output'])
+            print('%5d %-6s                            %d  ->      %3d' % (ind, 'connected', prev_filters,  filters))
+            prev_filters = filters
+            out_widths.append(1)
+            out_heights.append(1)
             out_filters.append(prev_filters)
         else:
             print('unknown type %s' % (block['type']))
