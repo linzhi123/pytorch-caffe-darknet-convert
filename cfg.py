@@ -169,7 +169,7 @@ def parse_prototxt(protofile):
         return -1
 
     def parse_block(fp):
-        block = dict()
+        block = OrderedDict()
         line = fp.readline().strip()
         while line != '}':
             ltype = line_type(line)
@@ -193,7 +193,7 @@ def parse_prototxt(protofile):
         return block
 
     fp = open(protofile, 'r')
-    props = dict()
+    props = OrderedDict()
     layers = []
     line = fp.readline()
     while line != '':
@@ -223,7 +223,7 @@ def parse_prototxt(protofile):
         line = fp.readline()
 
     if len(layers) > 0:
-        net_info = dict()
+        net_info = OrderedDict()
         net_info['props'] = props
         net_info['layers'] = layers
         return net_info
