@@ -230,3 +230,34 @@ def parse_prototxt(protofile):
     else:
         return props
 
+def print_prototxt(net_info):
+    def format_value(value):
+        str = u'%s' % value
+        if str.isnumeric():
+            return value
+        elif value == 'true' or value == 'false':
+            return value
+        else:
+            return '\"%s\"' % value
+
+    def print_block(block_info, prefix, indent):
+        blanks = ''.join([' ']*indent)
+        print('%s%s {' % (blanks, prefix))
+        for key,value in block_info.items():
+            if type(value) == OrderedDict:
+                print_block(value, key, indent+4)
+            else:
+                print('%s    %s: %s' % (blanks, key, format_value(value)))
+        print('%s}' % blanks)
+        
+    props = net_info['props']
+    layers = net_info['layers']
+    print('name: \"%s\"' % props['name'])
+    print('input: \"%s\"' % props['input'])
+    print('input_dim: %s' % props['input_dim'][0])
+    print('input_dim: %s' % props['input_dim'][1])
+    print('input_dim: %s' % props['input_dim'][2])
+    print('input_dim: %s' % props['input_dim'][3])
+    print('')
+    for layer in layers:
+        print_block(layer, 'layer', 0)
