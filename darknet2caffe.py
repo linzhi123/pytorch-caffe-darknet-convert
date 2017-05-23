@@ -106,6 +106,11 @@ def cfg2prototxt(cfgfile):
 
 if __name__ == '__main__':
     import sys
+    if len(sys.argv) != 2:
+        print('try:')
+        print('python darknet2caffe.py tiny-yolo.cfg')
+        exit()
+
     cfgfile = sys.argv[1]
     net_info = cfg2prototxt(cfgfile)
     print_prototxt(net_info)
