@@ -206,7 +206,13 @@ def parse_prototxt(protofile):
             key, value = line.split(':')
             key = key.strip()
             value = value.strip().strip('"')
-            props[key] = value
+            if props.has_key(key):
+               if type(props[key]) == list:
+                   props[key].append(value)
+               else:
+                   props[key] = [props[key], value]
+            else:
+                props[key] = value
         elif ltype == 1: # blockname {
             key = line.split('{')[0].strip()
             if key == 'layer':

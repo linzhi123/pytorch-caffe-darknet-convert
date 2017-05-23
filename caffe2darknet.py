@@ -2,28 +2,23 @@ from collections import OrderedDict
 from cfg import *
 
 def prototxt2cfg(protofile):
+    net_info = parse_prototxt(protofile)
+    props = net_info['props']
+
     blocks = []
     block = OrderedDict()
     block['type'] = 'net'
-    block['batch'] = '128'
-    block['subdivisions'] = '8'
-    block['height'] = '224'
-    block['width'] = '224'
-    block['channels'] = '256'
-    block['momentum'] = '0.9'
-    block['decay'] = '0.0001'
-    block['learning_rate'] = '0.05'
-    block['policy'] = 'poly'
-    block['power'] = '4'
-    block['max_batches'] = 500000
+    block['batch'] = props['input_dim'][0]
+    block['channels'] = props['input_dim'][1]
+    block['height'] = props['input_dim'][2]
+    block['width'] = props['input_dim'][3]
     blocks.append(block)
 
-    net_info = parse_prototxt(protofile)
     layers = net_info['layers']
     layer_num = len(layers)
     i = 0 # layer id
     layer_id = dict()
-    layer_id['data'] = 0
+    layer_id[props['input']] = 0
     while i < layer_num:
         layer = layers[i]
         if layer['type'] == 'Convolution':
