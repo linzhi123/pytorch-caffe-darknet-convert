@@ -107,6 +107,10 @@ def prototxt2cfg(protofile):
 
 if __name__ == '__main__':
     import sys
+    if len(sys.argv) != 2:
+        print('try:')
+        print('  python caffe2darknet.py ResNet-50-deploy.prototxt')
+        exit()
     blocks = prototxt2cfg(sys.argv[1])
     print_cfg(blocks)
     print_cfg_nicely(blocks)
