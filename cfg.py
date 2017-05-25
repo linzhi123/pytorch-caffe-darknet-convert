@@ -38,6 +38,14 @@ def print_cfg(blocks):
             if key != 'type':
                 print('%s=%s' % (key, value))
         print('')
+def save_cfg(blocks, cfgfile):
+    with open(cfgfile, 'w') as fp:
+        for block in blocks:
+            fp.write('[%s]\n' % (block['type']))
+            for key,value in block.items():
+                if key != 'type':
+                    fp.write('%s=%s\n' % (key, value))
+            fp.write('\n')
 
 def print_cfg_nicely(blocks):
     print('layer     filters    size              input                output');
@@ -174,6 +182,7 @@ def parse_prototxt(protofile):
         while line != '}':
             ltype = line_type(line)
             if ltype == 0: # key: value
+                print line
                 key, value = line.split(':')
                 key = key.strip()
                 value = value.strip().strip('"')
