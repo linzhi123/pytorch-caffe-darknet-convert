@@ -182,7 +182,7 @@ def parse_prototxt(protofile):
         while line != '}':
             ltype = line_type(line)
             if ltype == 0: # key: value
-                print line
+                #print line
                 key, value = line.split(':')
                 key = key.strip()
                 value = value.strip().strip('"')

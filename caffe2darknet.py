@@ -47,7 +47,7 @@ def caffe2darknet(protofile, caffemodel):
     layer_id[props['input']] = 0
     while i < layer_num:
         layer = layers[i]
-        print i,layer['name']
+        print i,layer['name'], layer['type']
         if layer['type'] == 'Convolution':
             if layer_id[layer['bottom']] != len(blocks)-1:
                 block = OrderedDict()
@@ -76,23 +76,24 @@ def caffe2darknet(protofile, caffemodel):
                 wdata += list(m_scale_layer.blobs[0].data)  ## bn_scale  <- sc_alpha
                 wdata += (np.array(m_bn_layer.blobs[0].data) / m_bn_layer.blobs[2].data[0]).tolist()  ## bn_mean <- bn_mean/bn_scale
                 wdata += (np.array(m_bn_layer.blobs[1].data) / m_bn_layer.blobs[2].data[0]).tolist()  ## bn_var  <- bn_var/bn_scale
+                i = i + 2
             else:
                 wdata += list(m_conv_layer.blobs[1].data)   ## conv_bias
             wdata += list(m_conv_layer.blobs[0].data)       ## conv_weights
             
-            if i+3 < layer_num and layers[i+3]['type'] == 'ReLU':
-                act_layer = layers[i+3]
+            if i+1 < layer_num and layers[i+1]['type'] == 'ReLU':
+                act_layer = layers[i+1]
                 block['activation'] = 'relu'
                 top = act_layer['top']
                 layer_id[top] = len(blocks)
                 blocks.append(block)
-                i = i + 4
+                i = i + 2
             else:
                 block['activation'] = 'linear'
-                top = scale_layer['top']
+                top = last_layer['top']
                 layer_id[top] = len(blocks)
                 blocks.append(block)
-                i = i + 3
+                i = i + 1
         elif layer['type'] == 'Pooling':
             assert(layer_id[layer['bottom']] == len(blocks)-1)
             block = OrderedDict()
@@ -151,6 +152,7 @@ def caffe2darknet(protofile, caffemodel):
             layer_id[top] = len(blocks)
             blocks.append(block)
             i = i + 1
+
     print 'done' 
     return blocks, np.array(wdata)
 
