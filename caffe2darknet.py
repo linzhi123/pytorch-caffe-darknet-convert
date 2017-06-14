@@ -153,6 +153,9 @@ def caffe2darknet(protofile, caffemodel):
             layer_id[top] = len(blocks)
             blocks.append(block)
             i = i + 1
+        else:
+            print('unknown type %s' % layer['type'])
+            i = i + 1
 
     print 'done' 
     return blocks, np.array(wdata)
@@ -262,6 +265,9 @@ def prototxt2cfg(protofile):
             top = layer['top']
             layer_id[top] = len(blocks)
             blocks.append(block)
+            i = i + 1
+        else:
+            print('unknown type %s' % layer['type'])
             i = i + 1
     return blocks
 
