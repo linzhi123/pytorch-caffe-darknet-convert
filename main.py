@@ -117,7 +117,12 @@ def main():
             model = Darknet('cfg/resnet50.cfg')
             print('load weights from resnet50.weights')
             model.load_weights('resnet50.weights')
-        elif args.arch == 'resnet18':
+        elif args.arch == 'resnet18-caffe':
+            from caffenet import CaffeNet
+            model = CaffeNet('resnet-18.prototxt')
+            print('load weights from resnet-18.caffemodel')
+            model.load_weights('resnet-18.caffemodel')
+        elif args.arch == 'resnet18-darknet':
             from darknet import Darknet
             model = Darknet('resnet-18.cfg')
             print('load weights from resnet-18.weights')
@@ -172,7 +177,7 @@ def main():
     if args.arch == 'resnet50-test':
         normalize = transforms.Normalize(mean=[0.0, 0.0, 0.0],
                                          std=[1.0, 1.0, 1.0])
-    elif args.arch == 'resnet18':
+    elif args.arch == 'resnet18-darknet' or args.arch == 'resnet18-caffe':
         normalize = transforms.Normalize(mean=[104/255.0, 117/255.0, 123/255.0],
                                          std=[1.0, 1.0, 1.0])
     else:
@@ -287,7 +292,7 @@ def validate(val_loader, model, criterion):
         target = target.cuda(async=True)
         input_var = torch.autograd.Variable(input, volatile=True)
         target_var = torch.autograd.Variable(target, volatile=True)
-        if args.arch == 'resnet18':
+        if args.arch == 'resnet18-darknet' or args.arch == 'resnet18-caffe':
             input_var = input_var * 255
 
         # compute output

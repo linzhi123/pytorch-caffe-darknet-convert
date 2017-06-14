@@ -2,20 +2,6 @@ from collections import OrderedDict
 from cfg import *
 from prototxt import *
 import numpy as np
-try:
-    import caffe_pb2
-except:
-    print 'caffe_pb2.py not found. Try:'
-    print '  protoc caffe.proto --python_out=.'
-    exit()
-
-def parse_caffemodel(caffemodel):
-    model = caffe_pb2.NetParameter()
-    print 'Loading caffemodel: ', caffemodel
-    with open(caffemodel, 'rb') as fp:
-        model.ParseFromString(fp.read())
-
-    return model
 
 def caffe2darknet(protofile, caffemodel):
     model = parse_caffemodel(caffemodel)

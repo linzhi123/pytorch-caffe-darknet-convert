@@ -1,4 +1,19 @@
 from collections import OrderedDict
+try:
+    import caffe_pb2
+except:
+    print 'caffe_pb2.py not found. Try:'
+    print '  protoc caffe.proto --python_out=.'
+    exit()
+
+def parse_caffemodel(caffemodel):
+    model = caffe_pb2.NetParameter()
+    print 'Loading caffemodel: ', caffemodel
+    with open(caffemodel, 'rb') as fp:
+        model.ParseFromString(fp.read())
+
+    return model
+
 
 def parse_prototxt(protofile):
     def line_type(line):

@@ -20,26 +20,21 @@ class Eltwise(nn.Module):
     def __init__(self, operation='+'):
         super(Eltwise, self).__init__()
         self.operation = operation
+
     def forward(self, x1, x2):
-        if isinstance(input_feats, tuple):
-            print "error : The input of Eltwise layer must be a tuple"
-        for i, feat in enumerate(input_feats):
-            if x is None:
-                x = feat
-                continue
-            if self.operation == '+' or self.operation == 'SUM':
-                x += feat
-            if self.operation == '*' or self.operation == 'MUL':
-                x *= feat
-            if self.operation == '/' or self.operation == 'DIV':
-                x /= feat
+        if self.operation == '+' or self.operation == 'SUM':
+            x = x1 + x2
+        if self.operation == '*' or self.operation == 'MUL':
+            x = x1 * x2
+        if self.operation == '/' or self.operation == 'DIV':
+            x = x1 / x2
         return x
 
 class CaffeNet(nn.Module):
     def __init__(self, protofile):
         super(CaffeNet, self).__init__()
         self.net_info = parse_prototxt(protofile)
-        self.models, self.loss = self.create_network(self.net_info)
+        self.models = self.create_network(self.net_info)
         self.modelList = nn.ModuleList()
         for name,model in self.models.items():
             self.modelList.append(model)
@@ -51,12 +46,14 @@ class CaffeNet(nn.Module):
         layers = self.net_info['layers']
         layer_num = len(layers)
         i = 0
+        tdata = None
         while i < layer_num:
             layer = layers[i]
             lname = layer['name']
             ltype = layer['type']
             tname = layer['top']
             bname = layer['bottom']
+            print('forward %s %s' % (ltype, lname))
             if ltype == 'Data' or ltype == 'Accuracy' or ltype == 'SoftmaxWithLoss':
                 i = i + 1
                 continue
@@ -65,15 +62,23 @@ class CaffeNet(nn.Module):
                 tname = layers[i]['top']
 
             if ltype != 'Eltwise':
+                print('    forward %s' % lname)
                 bdata = blobs[bname]
+                print(bdata.size())
+                print(self.models[lname])
                 tdata = self.models[lname](bdata)
+                print(tdata.size())
                 blobs[tname] = tdata
+                print('    forward success')
             else:
                 bdata0 = blobs[bname[0]]
                 bdata1 = blobs[bname[1]]
                 tdata = self.models[lname](bdata0, bdata1)
                 blobs[tname] = tdata
-        return blobs.values()[len(blobs)-1]
+            i = i + 1
+        print('forward one batch ok')
+        print('output device: ', tdata.data.get_device())
+        return tdata # blobs.values()[len(blobs)-1]
 
     def print_network(self):
         print(self.modelList)
@@ -90,7 +95,7 @@ class CaffeNet(nn.Module):
         for l in layers:
             lmap[l.name] = l
 
-        layers = net_info['layers']
+        layers = self.net_info['layers']
         layer_num = len(layers)
         i = 0
         while i < layer_num:
@@ -98,21 +103,26 @@ class CaffeNet(nn.Module):
             lname = layer['name']
             ltype = layer['type']
             if ltype == 'Convolution':
-                self.models[lname].weight.data = torch.from_numpy(np.array(lmap[lname].blobs[0].data))
+                self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
                 if len(lmap[lname].blobs) > 1:
-                    self.models[lname].bias.data = torch.from_numpy(np.array(lmap[lname].blobs[1].data))
+                    self.models[lname].bias.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[1].data)))
                 i = i + 1
             elif ltype == 'BatchNorm':
                 scale_layer = layers[i+1]
-                self.models[lname].running_mean = torch.from_numpy(np.arrray(lmap[lname].blobs[0].data) / lmap[lname].blobs[2].data[0])
-                self.models[lname].running_var = torch.from_numpy(np.arrray(lmap[lname].blobs[1].data) / lmap[lname].blobs[2].data[0])
-                self.models[lname].weight.data = torch.from_numpy(np.array(lmap[scale_layer['name']].blobs[0].data))
-                self.models[lname].bias.data = torch.from_numpy(np.array(lmap[scale_layer['name']].blobs[1].data))
+                self.models[lname].running_mean.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data) / lmap[lname].blobs[2].data[0]))
+                self.models[lname].running_var.copy_(torch.from_numpy(np.array(lmap[lname].blobs[1].data) / lmap[lname].blobs[2].data[0]))
+                self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[scale_layer['name']].blobs[0].data)))
+                self.models[lname].bias.data.copy_(torch.from_numpy(np.array(lmap[scale_layer['name']].blobs[1].data)))
                 i = i + 2
             elif ltype == 'InnerProduct':
-                self.models[lname].weight.data = torch.from_numpy(np.array(lmap[lname].blobs[0].data))
-                if len(lmap[lname].blobs) > 1:
-                    self.models[lname].bias.data = torch.from_numpy(np.array(lmap[lname].blobs[1].data))
+                if type(self.models[lname]) == nn.Sequential:
+                    self.models[lname][1].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
+                    if len(lmap[lname].blobs) > 1:
+                        self.models[lname][1].bias.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[1].data)))
+                else:
+                    self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
+                    if len(lmap[lname].blobs) > 1:
+                        self.models[lname].bias.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[1].data)))
                 i = i + 1
             elif ltype == 'Pooling' or ltype == 'Eltwise' or ltype == 'ReLU':
                 i = i + 1
@@ -122,18 +132,18 @@ class CaffeNet(nn.Module):
 
     def create_network(self, net_info):
         models = OrderedDict()
-        loss = None
         blob_channels = dict()
         blob_width = dict()
         blob_height = dict()
 
-        blob_channels['data'] = 1
-        blob_width['data'] = 28
-        blob_height['data'] = 28
-
         layers = net_info['layers']
         props = net_info['props']
         layer_num = len(layers)
+
+        print(props)
+        blob_channels['data'] = int(props['input_dim'][1])
+        blob_height['data'] = int(props['input_dim'][2])
+        blob_width['data'] = int(props['input_dim'][3])
         i = 0
         while i < layer_num:
             layer = layers[i]
@@ -164,7 +174,7 @@ class CaffeNet(nn.Module):
             elif ltype == 'BatchNorm':
                 assert(i + 1 < layer_num)
                 assert(layers[i+1]['type'] == 'Scale')
-                momentum = layer['batch_norm_param']['moving_average_fraction']
+                momentum = float(layer['batch_norm_param']['moving_average_fraction'])
                 channels = blob_channels[bname]
                 models[lname] = nn.BatchNorm2d(channels, momentum=momentum)
                 tname = layers[i+1]['top']
@@ -184,8 +194,8 @@ class CaffeNet(nn.Module):
                 stride = int(layer['pooling_param']['stride'])
                 models[lname] = nn.MaxPool2d(kernel_size, stride)
                 blob_channels[tname] = blob_channels[bname]
-                blob_width[tname] = blob_width[bname]/stride
-                blob_height[tname] = blob_height[bname]/stride
+                blob_width[tname] = (blob_width[bname] - kernel_size)/stride + 1
+                blob_height[tname] = (blob_height[bname] - kernel_size)/stride + 1
                 i = i + 1
             elif ltype == 'Eltwise':
                 operation = layer['eltwise_param']['operation']
@@ -198,29 +208,31 @@ class CaffeNet(nn.Module):
                 i = i + 1
             elif ltype == 'InnerProduct':
                 filters = int(layer['inner_product_param']['num_output'])
-                if blob_width[bname] != 1 or blob_height[bname] != 1:
+                if blob_width[bname] != -1 or blob_height[bname] != -1:
                     channels = blob_channels[bname] * blob_width[bname] * blob_height[bname]
                     models[lname] = nn.Sequential(FCView(), nn.Linear(channels, filters))
                 else:
                     channels = blob_channels[bname]
                     models[lname] = nn.Linear(channels, filters)
                 blob_channels[tname] = filters
-                blob_width[tname] = 1
-                blob_height[tname] = 1
+                blob_width[tname] = -1
+                blob_height[tname] = -1
                 i = i + 1
             elif ltype == 'Softmax':
                 models[lname] = nn.Softmax()
                 blob_channels[tname] = blob_channels[bname]
-                blob_width[tname] = 1
-                blob_height[tname] = 1
+                blob_width[tname] = -1
+                blob_height[tname] = -1
                 i = i + 1
             elif ltype == 'SoftmaxWithLoss':
                 loss = nn.CrossEntropyLoss()
+                blob_width[tname] = -1
+                blob_height[tname] = -1
                 i = i + 1
             else:
                 print('create_network: unknown type #%s#' % ltype)
                 i = i + 1
-        return models, loss
+        return models
 
 if __name__ == '__main__':
     import sys
