@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from cfg import *
+from prototxt import *
 import numpy as np
 try:
     import caffe_pb2
