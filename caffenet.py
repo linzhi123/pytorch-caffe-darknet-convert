@@ -35,9 +35,8 @@ class CaffeNet(nn.Module):
         super(CaffeNet, self).__init__()
         self.net_info = parse_prototxt(protofile)
         self.models = self.create_network(self.net_info)
-        self.modelList = nn.ModuleList()
         for name,model in self.models.items():
-            self.modelList.append(model)
+            self.add_module(name, model)
 
     def forward(self, data):
         blobs = OrderedDict()
@@ -65,15 +64,15 @@ class CaffeNet(nn.Module):
                 print('    forward %s' % lname)
                 bdata = blobs[bname]
                 print(bdata.size())
-                print(self.models[lname])
-                tdata = self.models[lname](bdata)
+                print(self._modules[lname])
+                tdata = self._modules[lname](bdata)
                 print(tdata.size())
                 blobs[tname] = tdata
                 print('    forward success')
             else:
                 bdata0 = blobs[bname[0]]
                 bdata1 = blobs[bname[1]]
-                tdata = self.models[lname](bdata0, bdata1)
+                tdata = self._modules[lname](bdata0, bdata1)
                 blobs[tname] = tdata
             i = i + 1
         print('forward one batch ok')
@@ -81,7 +80,7 @@ class CaffeNet(nn.Module):
         return tdata # blobs.values()[len(blobs)-1]
 
     def print_network(self):
-        print(self.modelList)
+        print(self)
         print_prototxt(self.net_info)
 
     def load_weights(self, caffemodel):
