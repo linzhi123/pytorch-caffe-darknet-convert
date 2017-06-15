@@ -39,6 +39,31 @@ Test: [190/196] Time 1.367 (0.826)      Loss 6.3394 (6.2196)    Prec@1 67.188 (7
 # convert resnet18
 ```
 1. Download resnet18 from https://github.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet.git and save as resnet-18.caffemodel
+python main.py -a resnet18-caffe --pretrained -e /home/xiaohang/ImageNet/                       
+=> using pre-trained model 'resnet18-caffe'
+load weights from resnet-18.caffemodel
+Loading caffemodel:  resnet-18.caffemodel
+Test: [0/196]   Time 26.190 (26.190)    Loss 4.0715 (4.0715)    Prec@1 46.094 (46.094)  Prec@5 69.141 (69.141)
+Test: [10/196]  Time 0.224 (2.906)      Loss 3.4033 (3.8355)    Prec@1 44.531 (48.970)  Prec@5 80.078 (77.202)
+Test: [20/196]  Time 0.224 (1.970)      Loss 2.6164 (3.2206)    Prec@1 63.672 (54.371)  Prec@5 82.031 (80.283)
+Test: [30/196]  Time 0.226 (1.741)      Loss 2.5001 (3.0542)    Prec@1 61.328 (56.074)  Prec@5 89.453 (81.099)
+Test: [40/196]  Time 0.134 (1.557)      Loss 3.8292 (3.3356)    Prec@1 42.188 (53.306)  Prec@5 78.516 (79.573)
+Test: [50/196]  Time 0.444 (1.485)      Loss 1.7084 (3.4501)    Prec@1 69.531 (51.754)  Prec@5 92.578 (79.059)
+Test: [60/196]  Time 0.241 (1.430)      Loss 2.8731 (3.3957)    Prec@1 54.688 (51.992)  Prec@5 80.859 (79.438)
+Test: [70/196]  Time 0.202 (1.396)      Loss 2.0834 (3.2644)    Prec@1 66.406 (53.323)  Prec@5 87.109 (80.210)
+Test: [80/196]  Time 0.203 (1.357)      Loss 3.3115 (3.2341)    Prec@1 50.781 (53.342)  Prec@5 76.562 (80.295)
+Test: [90/196]  Time 1.116 (1.324)      Loss 4.2364 (3.2489)    Prec@1 41.797 (53.280)  Prec@5 71.094 (79.842)
+Test: [100/196] Time 0.200 (1.291)      Loss 3.2269 (3.2853)    Prec@1 49.219 (52.943)  Prec@5 76.172 (79.359)
+Test: [110/196] Time 1.210 (1.277)      Loss 2.3854 (3.2734)    Prec@1 62.891 (53.167)  Prec@5 83.984 (79.318)
+Test: [120/196] Time 1.484 (1.280)      Loss 3.2796 (3.2547)    Prec@1 56.250 (53.454)  Prec@5 75.781 (79.177)
+Test: [130/196] Time 3.403 (1.266)      Loss 1.7630 (3.2657)    Prec@1 73.438 (53.232)  Prec@5 90.234 (78.960)
+Test: [140/196] Time 1.067 (1.248)      Loss 2.7910 (3.2501)    Prec@1 57.812 (53.433)  Prec@5 80.859 (79.017)
+Test: [150/196] Time 1.782 (1.234)      Loss 2.5301 (3.2540)    Prec@1 63.672 (53.498)  Prec@5 81.250 (78.922)
+Test: [160/196] Time 1.015 (1.222)      Loss 2.1617 (3.2481)    Prec@1 67.578 (53.470)  Prec@5 84.375 (78.906)
+Test: [170/196] Time 0.594 (1.223)      Loss 1.8699 (3.2633)    Prec@1 72.266 (53.388)  Prec@5 91.406 (78.733)
+Test: [180/196] Time 1.826 (1.217)      Loss 6.2149 (3.2853)    Prec@1 26.172 (53.149)  Prec@5 49.219 (78.468)
+Test: [190/196] Time 1.070 (1.212)      Loss 4.3020 (3.4285)    Prec@1 39.062 (52.090)  Prec@5 66.797 (77.094)
+ * Prec@1 51.902 Prec@5 76.834
 2. python caffe2darknet.py resnet-18.prototxt resnet-18.caffemodel resnet-18.cfg resnet-18.weights
 3. python main.py -a resnet18-darknet --pretrained -e /home/xiaohang/ImageNet/
 => using pre-trained model 'resnet18'
