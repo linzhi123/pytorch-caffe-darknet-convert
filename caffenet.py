@@ -117,7 +117,7 @@ class CaffeNet(nn.Module):
             if ltype == 'Convolution':
                 self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
                 if len(lmap[lname].blobs) > 1:
-                    print('convlution %s has bias' % lname)
+                    #print('convlution %s has bias' % lname)
                     self.models[lname].bias.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[1].data)))
                 i = i + 1
             elif ltype == 'BatchNorm':
@@ -251,10 +251,25 @@ class CaffeNet(nn.Module):
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) != 2:
-        print('Usage: python caffenet.py model.prototxt')
+    if len(sys.argv) != 4:
+        print('Usage: python caffenet.py model.prototxt model.caffemodel imgfile')
+        print('')
+        print('e.g. python caffenet.py ResNet-50-deploy.prototxt ResNet-50-model.caffemodel test.png')
         exit()
     from torch.autograd import Variable
     protofile = sys.argv[1]
     net = CaffeNet(protofile)
     net.print_network()
+
+    net.load_weights(sys.argv[2])
+    from PIL import Image
+    img = Image.open(sys.argv[3]) #.convert('RGB')
+    width = img.width
+    height = img.height
+    img = torch.ByteTensor(torch.ByteStorage.from_buffer(img.tobytes()))
+    img = img.view(height, width, 3)#.transpose(0,1).transpose(0,2).contiguous()
+    img = torch.stack([img[:,:,2], img[:,:,1], img[:,:,0]], 0)
+    img = img.view(1, 3, height, width)
+    img = img.float()
+    img = torch.autograd.Variable(img)
+    output = net(img)
