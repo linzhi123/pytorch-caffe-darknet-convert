@@ -297,7 +297,7 @@ def validate(val_loader, model, criterion):
         target = target.cuda(async=True)
         input_var = torch.autograd.Variable(input, volatile=True)
         target_var = torch.autograd.Variable(target, volatile=True)
-        if args.arch == 'resnet18-darknet' or args.arch == 'resnet18-caffe':
+        if args.arch == 'resnet18-darknet' or args.arch == 'resnet18-caffe' or args.arch == 'resnet50-kaiming':
             input_var = input_var * 255
 
         # compute output

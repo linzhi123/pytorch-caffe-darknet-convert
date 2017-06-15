@@ -43,7 +43,7 @@ class CaffeNet(nn.Module):
     def forward(self, data):
         if self.has_mean:
             batch_size = data.data.size(0)
-            data = data - torch.autograd.Variable(self.mean_img.repeat(batch_size, 1, 1, 1)/255.0)
+            data = data - torch.autograd.Variable(self.mean_img.repeat(batch_size, 1, 1, 1))
 
         blobs = OrderedDict()
         blobs['data'] = data
@@ -117,6 +117,7 @@ class CaffeNet(nn.Module):
             if ltype == 'Convolution':
                 self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
                 if len(lmap[lname].blobs) > 1:
+                    print('convlution %s has bias' % lname)
                     self.models[lname].bias.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[1].data)))
                 i = i + 1
             elif ltype == 'BatchNorm':
