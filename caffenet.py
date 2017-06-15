@@ -93,7 +93,8 @@ class CaffeNet(nn.Module):
             channels = int(self.net_info['props']['input_dim'][1])
             height = int(self.net_info['props']['input_dim'][2])
             width = int(self.net_info['props']['input_dim'][3])
-            mean_img = mean_img.view(channels, height, width)
+            mean_img = mean_img.view(channels, height, width)#.mean(0)
+            #mean_img = mean_img.repeat(3, 1, 1)
             self.register_buffer('mean_img', torch.zeros(channels, height, width))
             self.mean_img.copy_(mean_img)
 

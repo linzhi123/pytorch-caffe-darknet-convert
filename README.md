@@ -10,6 +10,32 @@ python caffe2darknet.py ResNet-50-deploy.prototxt
 # convert kaiming's resnet50 from caffe to darknet
 ```
 1. download resnet50 from https://github.com/KaimingHe/deep-residual-networks
+python main.py -a resnet50-kaiming --pretrained -e /home/xiaohang/ImageNet/
+=> using pre-trained model 'resnet50-kaiming'
+load weights from ResNet-50-model.caffemodel
+Loading caffemodel:  ResNet-50-model.caffemodel
+Test: [0/196]   Time 15.655 (15.655)    Loss 2.9010 (2.9010)    Prec@1 83.203 (83.203)  Prec@5 94.531 (94.531)
+Test: [10/196]  Time 0.635 (1.920)      Loss 4.2648 (3.5170)    Prec@1 73.047 (78.942)  Prec@5 92.188 (93.928)
+Test: [20/196]  Time 0.315 (1.407)      Loss 3.9468 (3.5804)    Prec@1 80.469 (78.609)  Prec@5 89.844 (93.415)
+Test: [30/196]  Time 0.552 (1.284)      Loss 4.3684 (3.3685)    Prec@1 76.953 (79.826)  Prec@5 94.922 (93.687)
+Test: [40/196]  Time 1.464 (1.195)      Loss 3.7958 (3.6040)    Prec@1 74.609 (78.230)  Prec@5 93.750 (93.807)
+Test: [50/196]  Time 0.942 (1.154)      Loss 2.1675 (3.5650)    Prec@1 82.812 (78.079)  Prec@5 96.484 (94.095)
+Test: [60/196]  Time 0.833 (1.112)      Loss 4.8222 (3.6257)    Prec@1 72.266 (77.824)  Prec@5 91.797 (94.185)
+Test: [70/196]  Time 0.473 (1.094)      Loss 3.5255 (3.5499)    Prec@1 76.562 (78.197)  Prec@5 95.312 (94.350)
+Test: [80/196]  Time 1.513 (1.083)      Loss 7.2892 (3.6905)    Prec@1 58.594 (77.701)  Prec@5 82.812 (93.977)
+Test: [90/196]  Time 1.232 (1.071)      Loss 9.4876 (3.9334)    Prec@1 47.656 (76.219)  Prec@5 81.250 (93.128)
+Test: [100/196] Time 0.541 (1.053)      Loss 6.3092 (4.1811)    Prec@1 64.062 (74.737)  Prec@5 87.109 (92.304)
+Test: [110/196] Time 1.355 (1.050)      Loss 4.9908 (4.3116)    Prec@1 66.797 (74.060)  Prec@5 89.844 (91.836)
+Test: [120/196] Time 0.325 (1.043)      Loss 6.1492 (4.3757)    Prec@1 62.891 (73.728)  Prec@5 85.938 (91.561)
+Test: [130/196] Time 2.841 (1.044)      Loss 2.6247 (4.5290)    Prec@1 79.297 (72.951)  Prec@5 94.531 (91.135)
+Test: [140/196] Time 0.328 (1.029)      Loss 4.8094 (4.6045)    Prec@1 69.922 (72.523)  Prec@5 88.672 (90.863)
+Test: [150/196] Time 2.078 (1.026)      Loss 4.9830 (4.6820)    Prec@1 74.219 (72.100)  Prec@5 86.719 (90.537)
+Test: [160/196] Time 0.309 (1.019)      Loss 4.2790 (4.7415)    Prec@1 76.562 (71.793)  Prec@5 88.672 (90.278)
+Test: [170/196] Time 2.491 (1.017)      Loss 3.6188 (4.8237)    Prec@1 77.344 (71.292)  Prec@5 95.703 (90.022)
+Test: [180/196] Time 0.863 (1.007)      Loss 6.5520 (4.8957)    Prec@1 54.688 (70.871)  Prec@5 82.031 (89.742)
+Test: [190/196] Time 1.756 (1.005)      Loss 7.0145 (4.9370)    Prec@1 55.078 (70.505)  Prec@5 82.031 (89.553)
+ * Prec@1 70.586 Prec@5 89.572
+Kaiming: ResNet-50 24.7% 7.8% (shorter side=256)
 2. 
 ```
 
