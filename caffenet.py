@@ -52,7 +52,6 @@ class CaffeNet(nn.Module):
             ltype = layer['type']
             tname = layer['top']
             bname = layer['bottom']
-            print('forward %s %s' % (ltype, lname))
             if ltype == 'Data' or ltype == 'Accuracy' or ltype == 'SoftmaxWithLoss':
                 i = i + 1
                 continue
@@ -61,22 +60,15 @@ class CaffeNet(nn.Module):
                 tname = layers[i]['top']
 
             if ltype != 'Eltwise':
-                print('    forward %s' % lname)
                 bdata = blobs[bname]
-                print(bdata.size())
-                print(self._modules[lname])
                 tdata = self._modules[lname](bdata)
-                print(tdata.size())
                 blobs[tname] = tdata
-                print('    forward success')
             else:
                 bdata0 = blobs[bname[0]]
                 bdata1 = blobs[bname[1]]
                 tdata = self._modules[lname](bdata0, bdata1)
                 blobs[tname] = tdata
             i = i + 1
-        print('forward one batch ok')
-        print('output device: ', tdata.data.get_device())
         return tdata # blobs.values()[len(blobs)-1]
 
     def print_network(self):
@@ -139,7 +131,6 @@ class CaffeNet(nn.Module):
         props = net_info['props']
         layer_num = len(layers)
 
-        print(props)
         blob_channels['data'] = int(props['input_dim'][1])
         blob_height['data'] = int(props['input_dim'][2])
         blob_width['data'] = int(props['input_dim'][3])
@@ -153,7 +144,6 @@ class CaffeNet(nn.Module):
                 continue
             bname = layer['bottom']
             tname = layer['top']
-            #print('lname = %s, ltype = #%s#, bname = %s, tname = %s' % (lname, ltype, bname, tname))
             if ltype == 'Convolution':
                 convolution_param = layer['convolution_param']
                 channels = blob_channels[bname]
