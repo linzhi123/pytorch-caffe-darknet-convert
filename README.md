@@ -7,7 +7,13 @@ python caffe2darknet.py ResNet-50-deploy.prototxt
 - [ ] load caffemodel
 - [ ] convert caffemodel to darknet weights
 
-# convert resnet50
+# convert kaiming's resnet50 from caffe to darknet
+```
+1. download resnet50 from https://github.com/KaimingHe/deep-residual-networks
+2. 
+```
+
+# convert resnet50 from pytorch to darknet
 ```
 1. python pytorch2darknet.py 
 2. python main.py -a resnet50 --pretrained -e /home/xiaohang/ImageNet/

@@ -1,5 +1,6 @@
 name: "ResNet-50"
 input: "data"
+mean_file: "ResNet_mean.binaryproto"
 input_dim: 1
 input_dim: 3
 input_dim: 224
@@ -2309,12 +2310,5 @@ layer {
 	inner_product_param {
 		num_output: 1000
 	}
-}
-
-layer {
-	bottom: "fc1000"
-	top: "prob"
-	name: "prob"
-	type: "Softmax"
 }
 

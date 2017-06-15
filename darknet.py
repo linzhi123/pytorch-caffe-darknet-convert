@@ -71,7 +71,10 @@ class Darknet(nn.Module):
         self.has_mean = False
 
     def load_mean_file(self, mean_file):
-        return torch.from_numpy(np.load(mean_file)).float()
+        import caffe_pb2
+        blob = caffe_pb2.BlobProto()
+        blob.ParseFromString(open(mean_file, 'rb').read())
+        return torch.from_numpy(np.array(blob.data)).float()
 
     def forward(self, x):
         if self.has_mean:

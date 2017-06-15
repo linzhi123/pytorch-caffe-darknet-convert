@@ -117,6 +117,11 @@ def main():
             model = Darknet('cfg/resnet50.cfg')
             print('load weights from resnet50.weights')
             model.load_weights('resnet50.weights')
+        elif args.arch == 'resnet50-kaiming':
+            from caffenet import CaffeNet
+            model = CaffeNet('ResNet-50-deploy.prototxt')
+            print('load weights from ResNet-50-model.caffemodel')
+            model.load_weights('ResNet-50-model.caffemodel')
         elif args.arch == 'resnet18-caffe':
             from caffenet import CaffeNet
             model = CaffeNet('resnet-18.prototxt')
@@ -174,7 +179,7 @@ def main():
     # Data loading code
     traindir = os.path.join(args.data, 'train')
     valdir = os.path.join(args.data, 'val')
-    if args.arch == 'resnet50-test':
+    if args.arch == 'resnet50-test' or args.arch == 'resnet50-kaiming':
         normalize = transforms.Normalize(mean=[0.0, 0.0, 0.0],
                                          std=[1.0, 1.0, 1.0])
     elif args.arch == 'resnet18-darknet' or args.arch == 'resnet18-caffe':

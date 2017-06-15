@@ -38,7 +38,13 @@ class CaffeNet(nn.Module):
         for name,model in self.models.items():
             self.add_module(name, model)
 
+        self.has_mean = False
+
     def forward(self, data):
+        if self.has_mean:
+            batch_size = data.data.size(0)
+            data = data - torch.autograd.Variable(self.mean_img.repeat(batch_size, 1, 1, 1)/255.0)
+
         blobs = OrderedDict()
         blobs['data'] = data
         
@@ -76,6 +82,21 @@ class CaffeNet(nn.Module):
         print_prototxt(self.net_info)
 
     def load_weights(self, caffemodel):
+        if self.net_info['props'].has_key('mean_file'):
+            import caffe_pb2
+            self.has_mean = True
+            mean_file = self.net_info['props']['mean_file']
+            blob = caffe_pb2.BlobProto()
+            blob.ParseFromString(open(mean_file, 'rb').read())
+            mean_img = torch.from_numpy(np.array(blob.data)).float()
+
+            channels = int(self.net_info['props']['input_dim'][1])
+            height = int(self.net_info['props']['input_dim'][2])
+            width = int(self.net_info['props']['input_dim'][3])
+            mean_img = mean_img.view(channels, height, width)
+            self.register_buffer('mean_img', torch.zeros(channels, height, width))
+            self.mean_img.copy_(mean_img)
+
         model = parse_caffemodel(caffemodel)
         layers = model.layer
         if len(layers) == 0:
@@ -153,7 +174,7 @@ class CaffeNet(nn.Module):
                 pad = int(convolution_param['pad']) if convolution_param.has_key('pad') else 0
                 group = int(convolution_param['group']) if convolution_param.has_key('group') else 1
                 bias = True
-                if convolution_param['bias_term'] == 'false':
+                if convolution_param.has_key('bias_term') and convolution_param['bias_term'] == 'false':
                     bias = False
                 models[lname] = nn.Conv2d(channels, out_filters, kernel_size, stride,pad,group, bias=bias)
                 blob_channels[tname] = out_filters
@@ -163,7 +184,9 @@ class CaffeNet(nn.Module):
             elif ltype == 'BatchNorm':
                 assert(i + 1 < layer_num)
                 assert(layers[i+1]['type'] == 'Scale')
-                momentum = float(layer['batch_norm_param']['moving_average_fraction'])
+                momentum = 0.9
+                if layer.has_key('batch_norm_param') and layer['batch_norm_param'].has_key('moving_average_fraction'):
+                    momentum = float(layer['batch_norm_param']['moving_average_fraction'])
                 channels = blob_channels[bname]
                 models[lname] = nn.BatchNorm2d(channels, momentum=momentum)
                 tname = layers[i+1]['top']
@@ -187,7 +210,9 @@ class CaffeNet(nn.Module):
                 blob_height[tname] = (blob_height[bname] - kernel_size)/stride + 1
                 i = i + 1
             elif ltype == 'Eltwise':
-                operation = layer['eltwise_param']['operation']
+                operation = 'SUM'
+                if layer.has_key('eltwise_param') and layer['eltwise_param'].has_key('operation'):
+                    operation = layer['eltwise_param']['operation']
                 bname0 = bname[0]
                 bname1 = bname[1]
                 models[lname] = Eltwise(operation)
