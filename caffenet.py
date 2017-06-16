@@ -38,6 +38,8 @@ class CaffeNet(nn.Module):
         for name,model in self.models.items():
             self.add_module(name, model)
 
+        self.width = int(self.net_info['props']['input_dim'][3])
+        self.height = int(self.net_info['props']['input_dim'][2])
         self.has_mean = False
 
     def forward(self, data):
@@ -58,7 +60,7 @@ class CaffeNet(nn.Module):
             ltype = layer['type']
             tname = layer['top']
             bname = layer['bottom']
-            if ltype == 'Data' or ltype == 'Accuracy' or ltype == 'SoftmaxWithLoss':
+            if ltype == 'Data' or ltype == 'Accuracy' or ltype == 'SoftmaxWithLoss' or ltype == 'Region':
                 i = i + 1
                 continue
             elif ltype == 'BatchNorm':
@@ -138,7 +140,7 @@ class CaffeNet(nn.Module):
                     if len(lmap[lname].blobs) > 1:
                         self.models[lname].bias.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[1].data)))
                 i = i + 1
-            elif ltype == 'Pooling' or ltype == 'Eltwise' or ltype == 'ReLU':
+            elif ltype == 'Pooling' or ltype == 'Eltwise' or ltype == 'ReLU' or ltype == 'Region':
                 i = i + 1
             else:
                 print('load_weights: unknown type %s' % ltype)
@@ -244,6 +246,13 @@ class CaffeNet(nn.Module):
                 loss = nn.CrossEntropyLoss()
                 blob_width[tname] = -1
                 blob_height[tname] = -1
+                i = i + 1
+            elif ltype == 'Region':
+                anchors = layer['region_param']['anchors'].strip('"').split(',')
+                self.anchors = [float(j) for j in anchors]
+                self.num_anchors = int(layer['region_param']['num'])
+                self.anchor_step = len(self.anchors)/self.num_anchors
+                self.num_classes = int(layer['region_param']['classes'])
                 i = i + 1
             else:
                 print('create_network: unknown type #%s#' % ltype)

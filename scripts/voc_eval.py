@@ -202,7 +202,7 @@ def voc_eval(detpath,
 
 
 def _do_python_eval(res_prefix, output_dir = 'output'):
-    _devkit_path = '/data/xiaohang/Train/pytorch/pytorch-yolo2/VOCdevkit'
+    _devkit_path = '/data/xiaohang/caffe-darknet-convert/VOCdevkit'
     _year = '2007'
     _classes = ('__background__', # always index 0
         'aeroplane', 'bicycle', 'bird', 'boat',

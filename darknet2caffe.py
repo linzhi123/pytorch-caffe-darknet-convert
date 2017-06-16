@@ -1,13 +1,17 @@
+import sys
+sys.path.append('/data/xiaohang/caffe/python')
+import caffe
+import numpy as np
 from collections import OrderedDict
 from cfg import *
 from prototxt import *
 
 def darknet2caffe(cfgfile, weightfile, protofile, caffemodel):
     net_info = cfg2prototxt(cfgfile)
-    save_prototxt(net_info , protofile)
+    save_prototxt(net_info , protofile, region=False)
 
     net = caffe.Net(protofile, caffe.TEST)
-    params = net.params.keys()
+    params = net.params
 
     blocks = parse_cfg(cfgfile)
     fp = open(weightfile, 'rb')
@@ -49,6 +53,10 @@ def darknet2caffe(cfgfile, weightfile, protofile, caffemodel):
         else:
             print('unknow layer type %s ' % block['type'])
             layer_id = layer_id + 1
+    print('save prototxt to %s' % protofile)
+    save_prototxt(net_info , protofile, region=True)
+    print('save caffemodel to %s' % caffemodel)
+    net.save(caffemodel)
 
 def load_conv2caffe(buf, start, conv_param):
     weight = conv_param[0].data
@@ -68,6 +76,7 @@ def load_conv_bn2caffe(buf, start, conv_param, bn_param, scale_param):
     scale_param[0].data[...] = np.reshape(buf[start:start+scale_weight.size], scale_weight.shape); start = start + scale_weight.size
     bn_param[0].data[...] = np.reshape(buf[start:start+running_mean.size], running_mean.shape); start = start + running_mean.size
     bn_param[1].data[...] = np.reshape(buf[start:start+running_var.size], running_var.shape); start = start + running_var.size
+    bn_param[2].data[...] = np.array([1.0])
     conv_param[0].data[...] = np.reshape(buf[start:start+conv_weight.size], conv_weight.shape); start = start + conv_weight.size
     return start
 
@@ -186,22 +195,23 @@ def cfg2prototxt(cfgfile):
             bottom = avg_layer['top']
             layer_id = layer_id+1
         elif block['type'] == 'region':
-            region_layer = OrderedDict()
-            region_layer['bottom'] = bottom
-            if block.has_key('name'):
-                region_layer['top'] = block['name']
-                region_layer['name'] = block['name']
-            else:
-                region_layer['top'] = 'layer%d-region' % layer_id
-                region_layer['name'] = 'layer%d-region' % layer_id
-            region_layer['type'] = 'Region'
-            region_param = OrderedDict()
-            region_param['anchors'] = block['anchors'].strip()
-            region_param['classes'] = block['classes']
-            region_param['num'] = block['num']
-            region_layer['region_param'] = region_param
-            layers.append(region_layer)
-            bottom = region_layer['top']
+            if True:
+                region_layer = OrderedDict()
+                region_layer['bottom'] = bottom
+                if block.has_key('name'):
+                    region_layer['top'] = block['name']
+                    region_layer['name'] = block['name']
+                else:
+                    region_layer['top'] = 'layer%d-region' % layer_id
+                    region_layer['name'] = 'layer%d-region' % layer_id
+                region_layer['type'] = 'Region'
+                region_param = OrderedDict()
+                region_param['anchors'] = block['anchors'].strip()
+                region_param['classes'] = block['classes']
+                region_param['num'] = block['num']
+                region_layer['region_param'] = region_param
+                layers.append(region_layer)
+                bottom = region_layer['top']
             layer_id = layer_id + 1
         else:
             print('unknow layer type %s ' % block['type'])
@@ -214,14 +224,18 @@ def cfg2prototxt(cfgfile):
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 5:
         print('try:')
-        print('python darknet2caffe.py tiny-yolo-voc.cfg')
+        print('python darknet2caffe.py tiny-yolo-voc.cfg tiny-yolo-voc.weights tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel')
         print('')
         print('please add name field for each block to avoid generated name')
         exit()
 
     cfgfile = sys.argv[1]
-    net_info = cfg2prototxt(cfgfile)
-    print_prototxt(net_info)
-    save_prototxt(net_info, 'tmp.prototxt')
+    #net_info = cfg2prototxt(cfgfile)
+    #print_prototxt(net_info)
+    #save_prototxt(net_info, 'tmp.prototxt')
+    weightfile = sys.argv[2]
+    protofile = sys.argv[3]
+    caffemodel = sys.argv[4]
+    darknet2caffe(cfgfile, weightfile, protofile, caffemodel)

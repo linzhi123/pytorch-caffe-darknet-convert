@@ -17,7 +17,11 @@ def valid(datacfg, cfgfile, weightfile, outfile):
         tmp_files = fp.readlines()
         valid_files = [item.rstrip() for item in tmp_files]
     
-    m = Darknet(cfgfile)
+    if cfgfile.find('.prototxt') >= 0:
+        from caffenet import CaffeNet
+        m = CaffeNet(cfgfile)
+    else:
+        m = Darknet(cfgfile)
     m.print_network()
     m.load_weights(weightfile)
     m.cuda()

@@ -1,10 +1,13 @@
 from collections import OrderedDict
 try:
-    import caffe_pb2
+    import caffe.proto.caffe_pb2 as caffe_pb2
 except:
-    print 'caffe_pb2.py not found. Try:'
-    print '  protoc caffe.proto --python_out=.'
-    exit()
+    try:
+        import caffe_pb2
+    except:
+        print 'caffe_pb2.py not found. Try:'
+        print '  protoc caffe.proto --python_out=.'
+        exit()
 
 def parse_caffemodel(caffemodel):
     model = caffe_pb2.NetParameter()
@@ -127,7 +130,7 @@ def print_prototxt(net_info):
     for layer in layers:
         print_block(layer, 'layer', 0)
 
-def save_prototxt(net_info, protofile):
+def save_prototxt(net_info, protofile, region=True):
     fp = open(protofile, 'w')
     # whether add double quote
     def format_value(value):
@@ -160,7 +163,8 @@ def save_prototxt(net_info, protofile):
     print >> fp, 'input_dim: %s' % props['input_dim'][3]
     print >> fp, ''
     for layer in layers:
-        print_block(layer, 'layer', 0)
+        if layer['type'] != 'Region' or region == True:
+            print_block(layer, 'layer', 0)
     fp.close()
 
 
