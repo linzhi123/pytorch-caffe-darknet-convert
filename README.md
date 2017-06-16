@@ -7,7 +7,9 @@ python caffe2darknet.py ResNet-50-deploy.prototxt
 - [ ] load caffemodel
 - [ ] convert caffemodel to darknet weights
 
-# convert kaiming's resnet50 from caffe to darknet
+---
+# Convert caffe to darknet
+## convert kaiming's resnet50 from caffe to darknet
 ```
 1. download resnet50 from https://github.com/KaimingHe/deep-residual-networks
 python main.py -a resnet50-kaiming --pretrained -e /home/xiaohang/ImageNet/
@@ -64,36 +66,7 @@ Test: [190/196] Time 1.099 (0.960)      Loss 1.1433 (1.0589)    Prec@1 71.094 (7
 The difference maybe because of the bias in the first conv layer.
 ```
 
-# convert resnet50 from pytorch to darknet
-```
-1. python pytorch2darknet.py 
-2. python main.py -a resnet50 --pretrained -e /home/xiaohang/ImageNet/
-=> using pre-trained model 'resnet50'
-load weights from resnet50.weights
-Test: [0/196]   Time 16.132 (16.132)    Loss 6.1005 (6.1005)    Prec@1 87.109 (87.109)  Prec@5 97.266 (97.266)
-Test: [10/196]  Time 0.387 (1.803)      Loss 6.2117 (6.1357)    Prec@1 77.734 (82.670)  Prec@5 91.797 (95.455)
-Test: [20/196]  Time 0.275 (1.261)      Loss 6.1050 (6.1402)    Prec@1 84.375 (82.236)  Prec@5 92.969 (95.424)
-Test: [30/196]  Time 0.162 (1.123)      Loss 6.1675 (6.1257)    Prec@1 80.469 (83.543)  Prec@5 95.312 (95.817)
-Test: [40/196]  Time 0.889 (1.024)      Loss 6.1888 (6.1483)    Prec@1 81.250 (82.012)  Prec@5 96.875 (95.770)
-Test: [50/196]  Time 0.164 (0.970)      Loss 6.0900 (6.1520)    Prec@1 88.281 (81.794)  Prec@5 97.656 (95.956)
-Test: [60/196]  Time 0.380 (0.933)      Loss 6.1949 (6.1566)    Prec@1 76.172 (81.416)  Prec@5 93.359 (95.946)
-Test: [70/196]  Time 0.427 (0.916)      Loss 6.2009 (6.1525)    Prec@1 78.516 (81.679)  Prec@5 96.484 (96.099)
-Test: [80/196]  Time 0.910 (0.900)      Loss 6.3763 (6.1584)    Prec@1 60.938 (81.134)  Prec@5 88.672 (95.751)
-Test: [90/196]  Time 1.035 (0.896)      Loss 6.4143 (6.1703)    Prec@1 55.078 (80.039)  Prec@5 86.328 (95.175)
-Test: [100/196] Time 0.162 (0.871)      Loss 6.3073 (6.1831)    Prec@1 68.359 (78.968)  Prec@5 91.406 (94.609)
-Test: [110/196] Time 0.658 (0.867)      Loss 6.1750 (6.1885)    Prec@1 76.953 (78.442)  Prec@5 94.922 (94.327)
-Test: [120/196] Time 0.165 (0.861)      Loss 6.2904 (6.1919)    Prec@1 71.094 (78.141)  Prec@5 88.281 (94.034)
-Test: [130/196] Time 1.751 (0.858)      Loss 6.1702 (6.2008)    Prec@1 81.250 (77.290)  Prec@5 94.141 (93.702)
-Test: [140/196] Time 0.163 (0.849)      Loss 6.2442 (6.2045)    Prec@1 75.000 (76.948)  Prec@5 90.625 (93.448)
-Test: [150/196] Time 2.031 (0.846)      Loss 6.1890 (6.2082)    Prec@1 76.953 (76.604)  Prec@5 91.016 (93.189)
-Test: [160/196] Time 0.161 (0.837)      Loss 6.1399 (6.2109)    Prec@1 86.719 (76.366)  Prec@5 94.531 (92.998)
-Test: [170/196] Time 1.687 (0.835)      Loss 6.1388 (6.2159)    Prec@1 82.812 (75.959)  Prec@5 97.656 (92.848)
-Test: [180/196] Time 1.185 (0.828)      Loss 6.3454 (6.2198)    Prec@1 68.750 (75.650)  Prec@5 91.797 (92.705)
-Test: [190/196] Time 1.367 (0.826)      Loss 6.3394 (6.2196)    Prec@1 67.188 (75.685)  Prec@5 95.703 (92.752)
- * Prec@1 75.794 Prec@5 92.798
-```
-
-# convert resnet18
+## convert resnet18
 ```
 1. Download resnet18 from https://github.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet.git and save as resnet-18.caffemodel
 python main.py -a resnet18-caffe --pretrained -e /home/xiaohang/ImageNet/       
@@ -146,6 +119,37 @@ Test: [170/196] Time 0.328 (0.989)      Loss 1.1040 (1.3789)    Prec@1 69.922 (6
 Test: [180/196] Time 1.271 (0.988)      Loss 1.5395 (1.3954)    Prec@1 60.547 (66.313)  Prec@5 87.891 (87.412)
 Test: [190/196] Time 0.292 (0.980)      Loss 1.6755 (1.3916)    Prec@1 56.641 (66.371)  Prec@5 84.766 (87.484)
  * Prec@1 66.562 Prec@5 87.562
+```
+
+---
+# Convert pytorch to darknet
+## convert resnet50 from pytorch to darknet
+```
+1. python pytorch2darknet.py 
+2. python main.py -a resnet50 --pretrained -e /home/xiaohang/ImageNet/
+=> using pre-trained model 'resnet50'
+load weights from resnet50.weights
+Test: [0/196]   Time 16.132 (16.132)    Loss 6.1005 (6.1005)    Prec@1 87.109 (87.109)  Prec@5 97.266 (97.266)
+Test: [10/196]  Time 0.387 (1.803)      Loss 6.2117 (6.1357)    Prec@1 77.734 (82.670)  Prec@5 91.797 (95.455)
+Test: [20/196]  Time 0.275 (1.261)      Loss 6.1050 (6.1402)    Prec@1 84.375 (82.236)  Prec@5 92.969 (95.424)
+Test: [30/196]  Time 0.162 (1.123)      Loss 6.1675 (6.1257)    Prec@1 80.469 (83.543)  Prec@5 95.312 (95.817)
+Test: [40/196]  Time 0.889 (1.024)      Loss 6.1888 (6.1483)    Prec@1 81.250 (82.012)  Prec@5 96.875 (95.770)
+Test: [50/196]  Time 0.164 (0.970)      Loss 6.0900 (6.1520)    Prec@1 88.281 (81.794)  Prec@5 97.656 (95.956)
+Test: [60/196]  Time 0.380 (0.933)      Loss 6.1949 (6.1566)    Prec@1 76.172 (81.416)  Prec@5 93.359 (95.946)
+Test: [70/196]  Time 0.427 (0.916)      Loss 6.2009 (6.1525)    Prec@1 78.516 (81.679)  Prec@5 96.484 (96.099)
+Test: [80/196]  Time 0.910 (0.900)      Loss 6.3763 (6.1584)    Prec@1 60.938 (81.134)  Prec@5 88.672 (95.751)
+Test: [90/196]  Time 1.035 (0.896)      Loss 6.4143 (6.1703)    Prec@1 55.078 (80.039)  Prec@5 86.328 (95.175)
+Test: [100/196] Time 0.162 (0.871)      Loss 6.3073 (6.1831)    Prec@1 68.359 (78.968)  Prec@5 91.406 (94.609)
+Test: [110/196] Time 0.658 (0.867)      Loss 6.1750 (6.1885)    Prec@1 76.953 (78.442)  Prec@5 94.922 (94.327)
+Test: [120/196] Time 0.165 (0.861)      Loss 6.2904 (6.1919)    Prec@1 71.094 (78.141)  Prec@5 88.281 (94.034)
+Test: [130/196] Time 1.751 (0.858)      Loss 6.1702 (6.2008)    Prec@1 81.250 (77.290)  Prec@5 94.141 (93.702)
+Test: [140/196] Time 0.163 (0.849)      Loss 6.2442 (6.2045)    Prec@1 75.000 (76.948)  Prec@5 90.625 (93.448)
+Test: [150/196] Time 2.031 (0.846)      Loss 6.1890 (6.2082)    Prec@1 76.953 (76.604)  Prec@5 91.016 (93.189)
+Test: [160/196] Time 0.161 (0.837)      Loss 6.1399 (6.2109)    Prec@1 86.719 (76.366)  Prec@5 94.531 (92.998)
+Test: [170/196] Time 1.687 (0.835)      Loss 6.1388 (6.2159)    Prec@1 82.812 (75.959)  Prec@5 97.656 (92.848)
+Test: [180/196] Time 1.185 (0.828)      Loss 6.3454 (6.2198)    Prec@1 68.750 (75.650)  Prec@5 91.797 (92.705)
+Test: [190/196] Time 1.367 (0.826)      Loss 6.3394 (6.2196)    Prec@1 67.188 (75.685)  Prec@5 95.703 (92.752)
+ * Prec@1 75.794 Prec@5 92.798
 ```
 
 
