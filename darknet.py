@@ -66,6 +66,14 @@ class Darknet(nn.Module):
         self.width = int(self.blocks[0]['width'])
         self.height = int(self.blocks[0]['height'])
 
+        if self.blocks[(len(self.blocks)-1)]['type'] == 'region':
+            region_block = self.blocks[(len(self.blocks)-1)]
+            anchors = region_block['anchors'].split(',')
+            self.anchors = [float(i) for i in anchors]
+            self.num_anchors = int(region_block['num'])
+            self.anchor_step = len(self.anchors)/self.num_anchors
+            self.num_classes = int(region_block['classes'])
+
         self.header = torch.IntTensor([0,0,0,0])
         self.seen = 0
         self.has_mean = False
@@ -112,6 +120,8 @@ class Darknet(nn.Module):
                     x = F.relu(x, inplace=True)
                 outputs[ind] = x
             elif block['type'] == 'cost':
+                continue
+            elif block['type'] == 'region':
                 continue
             else:
                 print('unknown type %s' % (block['type']))
@@ -214,6 +224,8 @@ class Darknet(nn.Module):
                 prev_filters = filters
                 out_filters.append(prev_filters)
                 models.append(model)
+            elif block['type'] == 'region':
+                continue
             else:
                 print('unknown type %s' % (block['type']))
     

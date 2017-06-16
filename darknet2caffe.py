@@ -2,15 +2,74 @@ from collections import OrderedDict
 from cfg import *
 from prototxt import *
 
-#def darknet2caffe(cfgfile, weightfile, protofile, caffemodel):
-#    net_info = cfg2prototxt(cfgfile)
-#    save_prototxt(net_info , protofile)
-#    caffe_net = CaffeNet(protofile)
-#    dark_net = Darknet(cfgfile)
-#    dark_net.load_weights(weightfile)
-#    dark_net.convert_weights_to_caffe(caffe_net)
-#    caffe_net.save_caffemodel()
-#    return net_info, caffeweights
+def darknet2caffe(cfgfile, weightfile, protofile, caffemodel):
+    net_info = cfg2prototxt(cfgfile)
+    save_prototxt(net_info , protofile)
+
+    net = caffe.Net(protofile, caffe.TEST)
+    params = net.params.keys()
+
+    blocks = parse_cfg(cfgfile)
+    fp = open(weightfile, 'rb')
+    header = np.fromfile(fp, count=4, dtype=np.int32)
+    buf = np.fromfile(fp, dtype = np.float32)
+    fp.close()
+
+    layers = []
+    layer_id = 1
+    start = 0
+    for block in blocks:
+        if start >= buf.size:
+            break
+
+        if block['type'] == 'net':
+            continue
+        elif block['type'] == 'convolutional':
+            batch_normalize = int(block['batch_normalize'])
+            if block.has_key('name'):
+                conv_layer_name = block['name']
+                bn_layer_name = '%s-bn' % block['name']
+                scale_layer_name = '%s-scale' % block['name']
+            else:
+                conv_layer_name = 'layer%d-conv' % layer_id
+                bn_layer_name = 'layer%d-bn' % layer_id
+                scale_layer_name = 'layer%d-scale' % layer_id
+
+            if batch_normalize:
+                start = load_conv_bn2caffe(buf, start, params[conv_layer_name], params[bn_layer_name], params[scale_layer_name])
+            else:
+                start = load_conv2caffe(buf, start, params[conv_layer_name])
+            layer_id = layer_id+1
+        elif block['type'] == 'maxpool':
+            layer_id = layer_id+1
+        elif block['type'] == 'avgpool':
+            layer_id = layer_id+1
+        elif block['type'] == 'region':
+            layer_id = layer_id + 1
+        else:
+            print('unknow layer type %s ' % block['type'])
+            layer_id = layer_id + 1
+
+def load_conv2caffe(buf, start, conv_param):
+    weight = conv_param[0].data
+    bias = conv_param[1].data
+    conv_param[1].data[...] = np.reshape(buf[start:start+bias.size], bias.shape);   start = start + bias.size
+    conv_param[0].data[...] = np.reshape(buf[start:start+weight.size], weight.shape); start = start + weight.size
+    return start
+
+def load_conv_bn2caffe(buf, start, conv_param, bn_param, scale_param):
+    conv_weight = conv_param[0].data
+    running_mean = bn_param[0].data
+    running_var = bn_param[1].data
+    scale_weight = scale_param[0].data
+    scale_bias = scale_param[1].data
+
+    scale_param[1].data[...] = np.reshape(buf[start:start+scale_bias.size], scale_bias.shape); start = start + scale_bias.size
+    scale_param[0].data[...] = np.reshape(buf[start:start+scale_weight.size], scale_weight.shape); start = start + scale_weight.size
+    bn_param[0].data[...] = np.reshape(buf[start:start+running_mean.size], running_mean.shape); start = start + running_mean.size
+    bn_param[1].data[...] = np.reshape(buf[start:start+running_var.size], running_var.shape); start = start + running_var.size
+    conv_param[0].data[...] = np.reshape(buf[start:start+conv_weight.size], conv_weight.shape); start = start + conv_weight.size
+    return start
 
 def cfg2prototxt(cfgfile):
     blocks = parse_cfg(cfgfile)
@@ -146,6 +205,7 @@ def cfg2prototxt(cfgfile):
             layer_id = layer_id + 1
         else:
             print('unknow layer type %s ' % block['type'])
+            layer_id = layer_id + 1
 
     net_info = OrderedDict()
     net_info['props'] = props

@@ -86,12 +86,21 @@ def parse_prototxt(protofile):
     else:
         return props
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 def print_prototxt(net_info):
+    # whether add double quote
     def format_value(value):
-        str = u'%s' % value
-        if str.isnumeric():
+        #str = u'%s' % value
+        #if str.isnumeric():
+        if is_number(value):
             return value
-        elif value == 'true' or value == 'false':
+        elif value == 'true' or value == 'false' or value == 'MAX':
             return value
         else:
             return '\"%s\"' % value
@@ -120,11 +129,13 @@ def print_prototxt(net_info):
 
 def save_prototxt(net_info, protofile):
     fp = open(protofile, 'w')
+    # whether add double quote
     def format_value(value):
-        str = u'%s' % value
-        if str.isnumeric():
+        #str = u'%s' % value
+        #if str.isnumeric():
+        if is_number(value):
             return value
-        elif value == 'true' or value == 'false':
+        elif value == 'true' or value == 'false' or value == 'MAX':
             return value
         else:
             return '\"%s\"' % value
