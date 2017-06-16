@@ -9,7 +9,7 @@ python caffe2darknet.py ResNet-50-deploy.prototxt
 
 ---
 # Convert caffe to darknet
-## convert kaiming's resnet50 from caffe to darknet
+^### convert kaiming's resnet50 from caffe to darknet
 ```
 1. download resnet50 from https://github.com/KaimingHe/deep-residual-networks
 python main.py -a resnet50-kaiming --pretrained -e /home/xiaohang/ImageNet/
@@ -66,7 +66,7 @@ Test: [190/196] Time 1.099 (0.960)      Loss 1.1433 (1.0589)    Prec@1 71.094 (7
 The difference maybe because of the bias in the first conv layer.
 ```
 
-## convert resnet18
+^### convert resnet18
 ```
 1. Download resnet18 from https://github.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet.git and save as resnet-18.caffemodel
 python main.py -a resnet18-caffe --pretrained -e /home/xiaohang/ImageNet/       
@@ -123,7 +123,7 @@ Test: [190/196] Time 0.292 (0.980)      Loss 1.6755 (1.3916)    Prec@1 56.641 (6
 
 ---
 # Convert pytorch to darknet
-## convert resnet50 from pytorch to darknet
+^### convert resnet50 from pytorch to darknet
 ```
 1. python pytorch2darknet.py 
 2. python main.py -a resnet50 --pretrained -e /home/xiaohang/ImageNet/
