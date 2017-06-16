@@ -8,7 +8,7 @@ def cfg2prototxt(cfgfile):
     layers = []
     props = OrderedDict() 
     bottom = 'data'
-    cur_id = 1
+    layer_id = 1
     for block in blocks:
         if block['type'] == 'net':
             props['name'] = 'Darkent2Caffe'
@@ -21,8 +21,12 @@ def cfg2prototxt(cfgfile):
         elif block['type'] == 'convolutional':
             conv_layer = OrderedDict()
             conv_layer['bottom'] = bottom
-            conv_layer['top'] = 'conv%d' % cur_id
-            conv_layer['name'] = 'conv%d' % cur_id
+            if block.has_key('name'):
+                conv_layer['top'] = block['name']
+                conv_layer['name'] = block['name']
+            else:
+                conv_layer['top'] = 'layer%d-conv' % layer_id
+                conv_layer['name'] = 'layer%d-conv' % layer_id
             conv_layer['type'] = 'Convolution'
             convolution_param = OrderedDict()
             convolution_param['num_output'] = block['filters']
@@ -38,7 +42,10 @@ def cfg2prototxt(cfgfile):
                 bn_layer = OrderedDict()
                 bn_layer['bottom'] = bottom
                 bn_layer['top'] = bottom
-                bn_layer['name'] = 'bn_conv%d' % cur_id
+                if block.has_key('name'):
+                    bn_layer['name'] = '%s-bn' % block['name']
+                else:
+                    bn_layer['name'] = 'layer%d-bn' % layer_id
                 bn_layer['type'] = 'BatchNorm'
                 batch_norm_param = OrderedDict()
                 batch_norm_param['use_global_stats'] = 'true'
@@ -48,7 +55,10 @@ def cfg2prototxt(cfgfile):
                 scale_layer = OrderedDict()
                 scale_layer['bottom'] = bottom
                 scale_layer['top'] = bottom
-                scale_layer['name'] = 'scale_conv%d' % cur_id
+                if block.has_key('name'):
+                    scale_layer['name'] = '%s-scale' % block['name']
+                else:
+                    scale_layer['name'] = 'layer%d-scale' % layer_id
                 scale_layer['type'] = 'Scale'
                 scale_param = OrderedDict()
                 scale_param['bias_term'] = 'true'
@@ -59,19 +69,26 @@ def cfg2prototxt(cfgfile):
                 relu_layer = OrderedDict()
                 relu_layer['bottom'] = bottom
                 relu_layer['top'] = bottom
-                relu_layer['name'] = 'conv%d_reul' % cur_id
+                if block.has_key('name'):
+                    relu_layer['name'] = '%s-act' % block['name']
+                else:
+                    relu_layer['name'] = 'layer%d-act' % layer_id
                 relu_layer['type'] = 'ReLU'
                 if block['activation'] == 'leaky':
                     relu_param = OrderedDict()
                     relu_param['negative_slope'] = '0.1'
                     relu_layer['relu_param'] = relu_param
                 layers.append(relu_layer)
-            cur_id = cur_id+1
+            layer_id = layer_id+1
         elif block['type'] == 'maxpool':
             max_layer = OrderedDict()
             max_layer['bottom'] = bottom
-            max_layer['top'] = 'pool%d' % cur_id
-            max_layer['name'] = 'pool%d' % cur_id
+            if block.has_key('name'):
+                max_layer['top'] = block['name']
+                max_layer['name'] = block['name']
+            else:
+                max_layer['top'] = 'layer%d-maxpool' % layer_id
+                max_layer['name'] = 'layer%d-maxpool' % layer_id
             max_layer['type'] = 'Pooling'
             pooling_param = OrderedDict()
             pooling_param['kernel_size'] = block['size']
@@ -80,12 +97,16 @@ def cfg2prototxt(cfgfile):
             max_layer['pooling_param'] = pooling_param
             layers.append(max_layer)
             bottom = max_layer['top']
-            cur_id = cur_id+1
+            layer_id = layer_id+1
         elif block['type'] == 'avgpool':
             avg_layer = OrderedDict()
             avg_layer['bottom'] = bottom
-            avg_layer['top'] = 'pool%d' % cur_id
-            avg_layer['name'] = 'pool%d' % cur_id
+            if block.has_key('name'):
+                avg_layer['top'] = block['name']
+                avg_layer['name'] = block['name']
+            else:
+                avg_layer['top'] = 'layer%d-avgpool' % layer_id
+                avg_layer['name'] = 'layer%d-avgpool' % layer_id
             avg_layer['type'] = 'Pooling'
             pooling_param = OrderedDict()
             pooling_param['kernel_size'] = 7
@@ -94,7 +115,7 @@ def cfg2prototxt(cfgfile):
             avg_layer['pooling_param'] = pooling_param
             layers.append(avg_layer)
             bottom = avg_layer['top']
-            cur_id = cur_id+1
+            layer_id = layer_id+1
         elif block['type'] == 'region':
             continue
         else:
