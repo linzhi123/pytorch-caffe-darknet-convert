@@ -122,6 +122,11 @@ def main():
             model = CaffeNet('ResNet-50-deploy.prototxt')
             print('load weights from ResNet-50-model.caffemodel')
             model.load_weights('ResNet-50-model.caffemodel')
+        elif args.arch == 'resnet50-kaiming-dk':
+            from darknet import Darknet
+            model = Darknet('ResNet-50-model.cfg')
+            print('load weights from ResNet-50-model.weights')
+            model.load_weights('ResNet-50-model.weights')
         elif args.arch == 'resnet18-caffe':
             from caffenet import CaffeNet
             model = CaffeNet('resnet-18.prototxt')
@@ -179,7 +184,7 @@ def main():
     # Data loading code
     traindir = os.path.join(args.data, 'train')
     valdir = os.path.join(args.data, 'val')
-    if args.arch == 'resnet50-test' or args.arch == 'resnet50-kaiming':
+    if args.arch == 'resnet50-test' or args.arch == 'resnet50-kaiming' or args.arch == 'resnet50-kaiming-dk':
         normalize = transforms.Normalize(mean=[0.0, 0.0, 0.0],
                                          std=[1.0, 1.0, 1.0])
     elif args.arch == 'resnet18-darknet' or args.arch == 'resnet18-caffe':
@@ -295,12 +300,11 @@ def validate(val_loader, model, criterion):
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
         target = target.cuda(async=True)
-        if args.arch == 'resnet50-kaiming' or args.arch == 'resnet18-caffe' or args.arch == 'resnet18-darknet':
+        if args.arch == 'resnet50-kaiming' or args.arch == 'resnet50-kaiming-dk' or args.arch == 'resnet18-caffe' or args.arch == 'resnet18-darknet':
             input = torch.stack([input[:,2,:,:], input[:,1,:,:], input[:,0,:,:]],1)
+            input = input * 255
         input_var = torch.autograd.Variable(input, volatile=True)
         target_var = torch.autograd.Variable(target, volatile=True)
-        if args.arch == 'resnet18-darknet' or args.arch == 'resnet18-caffe' or args.arch == 'resnet50-kaiming':
-            input_var = input_var * 255
 
         # compute output
         output = model(input_var)

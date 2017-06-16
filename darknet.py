@@ -70,16 +70,10 @@ class Darknet(nn.Module):
         self.seen = 0
         self.has_mean = False
 
-    def load_mean_file(self, mean_file):
-        import caffe_pb2
-        blob = caffe_pb2.BlobProto()
-        blob.ParseFromString(open(mean_file, 'rb').read())
-        return torch.from_numpy(np.array(blob.data)).float()
-
     def forward(self, x):
         if self.has_mean:
             batch_size = x.data.size(0)
-            x = x - self.mean_img.repeate(batch_size, 1, 1, 1)/255.0
+            x = x - torch.autograd.Variable(self.mean_img.repeat(batch_size, 1, 1, 1))
 
         ind = -2
         self.loss = None
@@ -227,9 +221,20 @@ class Darknet(nn.Module):
 
     def load_weights(self, weightfile):
         if self.blocks[0].has_key('mean_file'):
+            import caffe_pb2
             mean_file = self.blocks[0]['mean_file']
+            mean_file = mean_file.strip('"')
             self.has_mean = True
-            self.mean_img = Variable(self.load_mean_file(mean_file), requires_grad=False)
+            blob = caffe_pb2.BlobProto()
+            blob.ParseFromString(open(mean_file, 'rb').read())
+            mean_img = torch.from_numpy(np.array(blob.data)).float()
+            channels = int(self.blocks[0]['channels'])
+            height = int(self.blocks[0]['height'])
+            width = int(self.blocks[0]['width'])
+            mean_img = mean_img.view(channels, height, width)
+
+            self.register_buffer('mean_img', torch.zeros(channels, height, width))
+            self.mean_img.copy_(mean_img)
 
         fp = open(weightfile, 'rb')
         header = np.fromfile(fp, count=4, dtype=np.int32)
