@@ -295,7 +295,7 @@ def validate(val_loader, model, criterion):
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
         target = target.cuda(async=True)
-        if args.arch == 'resnet50-kaiming':
+        if args.arch == 'resnet50-kaiming' or args.arch == 'resnet18-caffe' or args.arch == 'resnet18-darknet':
             input = torch.stack([input[:,2,:,:], input[:,1,:,:], input[:,0,:,:]],1)
         input_var = torch.autograd.Variable(input, volatile=True)
         target_var = torch.autograd.Variable(target, volatile=True)
