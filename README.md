@@ -8,6 +8,10 @@ python caffe2darknet.py ResNet-50-deploy.prototxt
 - [ ] convert caffemodel to darknet weights
 
 ---
+# Convert darknet to caffe
+### convert tiny-yolo from darknet to caffe
+
+---
 # Convert caffe to darknet
 ### convert kaiming's resnet50 from caffe to darknet
 ```

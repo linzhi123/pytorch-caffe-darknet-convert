@@ -2,6 +2,16 @@ from collections import OrderedDict
 from cfg import *
 from prototxt import *
 
+#def darknet2caffe(cfgfile, weightfile, protofile, caffemodel):
+#    net_info = cfg2prototxt(cfgfile)
+#    save_prototxt(net_info , protofile)
+#    caffe_net = CaffeNet(protofile)
+#    dark_net = Darknet(cfgfile)
+#    dark_net.load_weights(weightfile)
+#    dark_net.convert_weights_to_caffe(caffe_net)
+#    caffe_net.save_caffemodel()
+#    return net_info, caffeweights
+
 def cfg2prototxt(cfgfile):
     blocks = parse_cfg(cfgfile)
 
@@ -146,7 +156,7 @@ if __name__ == '__main__':
     import sys
     if len(sys.argv) != 2:
         print('try:')
-        print('python darknet2caffe.py tiny-yolo.cfg')
+        print('python darknet2caffe.py tiny-yolo-voc.cfg')
         print('')
         print('please add name field for each block to avoid generated name')
         exit()
@@ -154,3 +164,4 @@ if __name__ == '__main__':
     cfgfile = sys.argv[1]
     net_info = cfg2prototxt(cfgfile)
     print_prototxt(net_info)
+    save_prototxt(net_info, 'tmp.prototxt')

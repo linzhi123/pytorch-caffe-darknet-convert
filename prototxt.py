@@ -118,6 +118,41 @@ def print_prototxt(net_info):
     for layer in layers:
         print_block(layer, 'layer', 0)
 
+def save_prototxt(net_info, protofile):
+    fp = open(protofile, 'w')
+    def format_value(value):
+        str = u'%s' % value
+        if str.isnumeric():
+            return value
+        elif value == 'true' or value == 'false':
+            return value
+        else:
+            return '\"%s\"' % value
+
+    def print_block(block_info, prefix, indent):
+        blanks = ''.join([' ']*indent)
+        print >>fp, '%s%s {' % (blanks, prefix)
+        for key,value in block_info.items():
+            if type(value) == OrderedDict:
+                print_block(value, key, indent+4)
+            else:
+                print >> fp, '%s    %s: %s' % (blanks, key, format_value(value))
+        print >> fp, '%s}' % blanks
+        
+    props = net_info['props']
+    layers = net_info['layers']
+    print >> fp, 'name: \"%s\"' % props['name']
+    print >> fp, 'input: \"%s\"' % props['input']
+    print >> fp, 'input_dim: %s' % props['input_dim'][0]
+    print >> fp, 'input_dim: %s' % props['input_dim'][1]
+    print >> fp, 'input_dim: %s' % props['input_dim'][2]
+    print >> fp, 'input_dim: %s' % props['input_dim'][3]
+    print >> fp, ''
+    for layer in layers:
+        print_block(layer, 'layer', 0)
+    fp.close()
+
+
 if __name__ == '__main__':
     import sys
     if len(sys.argv) != 2:
@@ -126,3 +161,4 @@ if __name__ == '__main__':
 
     net_info = parse_prototxt(sys.argv[1])
     print_prototxt(net_info)
+    save_prototxt(net_info, 'tmp.prototxt')
