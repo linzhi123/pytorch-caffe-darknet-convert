@@ -117,7 +117,23 @@ def cfg2prototxt(cfgfile):
             bottom = avg_layer['top']
             layer_id = layer_id+1
         elif block['type'] == 'region':
-            continue
+            region_layer = OrderedDict()
+            region_layer['bottom'] = bottom
+            if block.has_key('name'):
+                region_layer['top'] = block['name']
+                region_layer['name'] = block['name']
+            else:
+                region_layer['top'] = 'layer%d-region' % layer_id
+                region_layer['name'] = 'layer%d-region' % layer_id
+            region_layer['type'] = 'Region'
+            region_param = OrderedDict()
+            region_param['anchors'] = block['anchors'].strip()
+            region_param['classes'] = block['classes']
+            region_param['num'] = block['num']
+            region_layer['region_param'] = region_param
+            layers.append(region_layer)
+            bottom = region_layer['top']
+            layer_id = layer_id + 1
         else:
             print('unknow layer type %s ' % block['type'])
 
