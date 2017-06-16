@@ -25,6 +25,8 @@ def caffe2darknet(protofile, caffemodel):
     block['channels'] = props['input_dim'][1]
     block['height'] = props['input_dim'][2]
     block['width'] = props['input_dim'][3]
+    if props.has_key('mean_file'):
+        block['mean_file'] = props['mean_file']
     blocks.append(block)
 
     layers = net_info['layers']
@@ -157,6 +159,8 @@ def prototxt2cfg(protofile):
     block['channels'] = props['input_dim'][1]
     block['height'] = props['input_dim'][2]
     block['width'] = props['input_dim'][3]
+    if props.has_key('mean_file'):
+        block['mean_file'] = props['mean_file']
     blocks.append(block)
 
     layers = net_info['layers']

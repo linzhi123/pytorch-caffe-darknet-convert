@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from cfg import *
+from prototxt import *
 
 def cfg2prototxt(cfgfile):
     blocks = parse_cfg(cfgfile)
@@ -109,6 +110,8 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('try:')
         print('python darknet2caffe.py tiny-yolo.cfg')
+        print('')
+        print('please add name field for each block to avoid generated name')
         exit()
 
     cfgfile = sys.argv[1]
