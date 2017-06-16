@@ -112,6 +112,7 @@ def cfg2prototxt(cfgfile):
             if block['pad'] == '1':
                 convolution_param['pad'] = str(int(convolution_param['kernel_size'])/2)
             convolution_param['stride'] = block['stride']
+            convolution_param['bias_term'] = 'false'
             conv_layer['convolution_param'] = convolution_param
             layers.append(conv_layer)
             bottom = conv_layer['top']
