@@ -118,9 +118,13 @@ class CaffeNet(nn.Module):
             lname = layer['name']
             ltype = layer['type']
             if ltype == 'Convolution':
+                convolution_param = layer['convolution_param']
+                bias = True
+                if convolution_param.has_key('bias_term') and convolution_param['bias_term'] == 'false':
+                    bias = False
                 self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
-                if len(lmap[lname].blobs) > 1:
-                    #print('convlution %s has bias' % lname)
+                if bias and len(lmap[lname].blobs) > 1:
+                    print('convlution %s has bias' % lname)
                     self.models[lname].bias.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[1].data)))
                 i = i + 1
             elif ltype == 'BatchNorm':
