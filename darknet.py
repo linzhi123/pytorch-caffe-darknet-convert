@@ -290,6 +290,8 @@ class Darknet(nn.Module):
                 pass
             elif block['type'] == 'cost':
                 pass
+            elif block['type'] == 'region':
+                pass
             else:
                 print('unknown type %s' % (block['type']))
 
@@ -330,6 +332,77 @@ class Darknet(nn.Module):
                 pass
             elif block['type'] == 'cost':
                 pass
+            elif block['type'] == 'region':
+                pass
             else:
                 print('unknown type %s' % (block['type']))
         fp.close()
+
+    def save_shrink_model(self, out_cfgfile, out_weightfile, cutoff=0):
+        if cutoff <= 0:
+            cutoff = len(self.blocks)-1
+
+        # shrink weights
+        fp = open(out_weightfile, 'wb')
+        self.header[3] = self.seen
+        header = self.header
+        header.numpy().tofile(fp)
+
+        ind = -1
+        for blockId in range(1, cutoff+1):
+            ind = ind + 1
+            block = self.blocks[blockId]
+            if block['type'] == 'convolutional':
+                model = self.models[ind]
+                batch_normalize = int(block['batch_normalize'])
+                if batch_normalize:
+                    save_conv_shrink_bn(fp, model[0], model[1])
+                else:
+                    save_conv(fp, model[0])
+            elif block['type'] == 'connected':
+                model = self.models[ind]
+                save_fc(fc, model[0])
+            elif block['type'] == 'maxpool':
+                pass
+            elif block['type'] == 'reorg':
+                pass
+            elif block['type'] == 'route':
+                pass
+            elif block['type'] == 'shortcut':
+                pass
+            elif block['type'] == 'avgpool':
+                pass
+            elif block['type'] == 'softmax':
+                pass
+            elif block['type'] == 'cost':
+                pass
+            elif block['type'] == 'region':
+                pass
+            else:
+                print('unknown type %s' % (block['type']))
+        fp.close()
+
+        # shrink cfg file
+        blocks = self.blocks
+        for block in blocks:
+            if block['type'] == 'convolutional':
+               block['batch_normalize'] = '0' 
+        save_cfg(blocks, out_cfgfile)
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) != 5:
+        print('try:')
+        print('python darknet.py tiny-yolo-voc.cfg tiny-yolo-voc.weights tiny-yolo-voc-nobn.cfg tiny-yolo-voc-nobn.weights')
+        print('')
+        exit()
+
+    in_cfgfile = sys.argv[1]
+    in_weightfile = sys.argv[2]
+    out_cfgfile = sys.argv[3]
+    out_weightfile = sys.argv[4]
+    model = Darknet(in_cfgfile)
+    model.load_weights(in_weightfile)
+    print('save %s' % out_cfgfile)
+    print('save %s' % out_weightfile)
+    model.save_shrink_model(out_cfgfile, out_weightfile)

@@ -209,6 +209,20 @@ def save_conv_bn(fp, conv_model, bn_model):
         bn_model.running_var.numpy().tofile(fp)
         conv_model.weight.data.numpy().tofile(fp)
 
+def save_conv_shrink_bn(fp, conv_model, bn_model, eps=1e-5):
+    if bn_model.bias.is_cuda:
+        bias = bn_model.bias.data - bn_model.running_mean * bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)
+        convert2cpu(bias).numpy().tofile(fp)
+        s = conv_model.weight.data.size()
+        weight = conv_model.weight.data * (bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)).view(-1,1,1,1).repeat(1, s[1], s[2], s[3])
+        convert2cpu(weight).numpy().tofile(fp)
+    else:
+        bias = bn_model.bias.data - bn_model.running_mean * bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)
+        bias.numpy().tofile(fp)
+        s = conv_model.weight.data.size()
+        weight = conv_model.weight.data * (bn_model.weight.data / torch.sqrt(bn_model.running_var + eps)).view(-1,1,1,1).repeat(1, s[1], s[2], s[3])
+        weight.numpy().tofile(fp)
+
 def load_fc(buf, start, fc_model):
     num_w = fc_model.weight.numel()
     num_b = fc_model.bias.numel()

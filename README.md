@@ -39,6 +39,36 @@ Mean AP = 0.5391
 4. python detect.py tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel data/dog.jpg 
 ```
 
+### convert tiny-yolo from darknet to caffe without bn
+```
+1. python darknet.py tiny-yolo-voc.cfg tiny-yolo-voc.weights tiny-yolo-voc-nobn.cfg tiny-yolo-voc-nobn.weights
+2. python darknet2caffe.py tiny-yolo-voc-nobn.cfg tiny-yolo-voc-nobn.weights tiny-yolo-voc-nobn.prototxt tiny-yolo-voc-nobn.caffemodel
+3. python valid.py cfg/voc.data tiny-yolo-voc-nobn.prototxt tiny-yolo-voc-nobn.caffemodel
+4. python scripts/voc_eval.py results/comp4_det_test_
+VOC07 metric? Yes
+AP for aeroplane = 0.6094
+AP for bicycle = 0.6781
+AP for bird = 0.4573
+AP for boat = 0.3786
+AP for bottle = 0.2081
+AP for bus = 0.6645
+AP for car = 0.6587
+AP for cat = 0.6720
+AP for chair = 0.3245
+AP for cow = 0.4902
+AP for diningtable = 0.5549
+AP for dog = 0.5905
+AP for horse = 0.6871
+AP for motorbike = 0.6695
+AP for person = 0.5833
+AP for pottedplant = 0.2535
+AP for sheep = 0.5374
+AP for sofa = 0.4878
+AP for train = 0.7004
+AP for tvmonitor = 0.5754
+Mean AP = 0.5391
+5. python detect.py tiny-yolo-voc-nobn.prototxt tiny-yolo-voc-nobn.caffemodel data/dog.jpg 
+```
 ---
 # Convert caffe to darknet
 ### convert kaiming's resnet50 from caffe to darknet
