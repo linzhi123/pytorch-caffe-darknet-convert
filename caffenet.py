@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from collections import OrderedDict
 from prototxt import *
+from darknet import MaxPoolStride1
 
 class FCView(nn.Module):
     def __init__(self):
@@ -204,7 +205,11 @@ class CaffeNet(nn.Module):
                 i = i + 2
             elif ltype == 'ReLU':
                 inplace = (bname == tname)
-                models[lname] = nn.ReLU(inplace=inplace)
+                if layer.has_key('relu_param') and layer['relu_param'].has_key('negative_slope'):
+                    negative_slope = float(layer['relu_param']['negative_slope'])
+                    models[lname] = nn.LeakyReLU(negative_slope=negative_slope, inplace=inplace)
+                else:
+                    models[lname] = nn.ReLU(inplace=inplace)
                 blob_channels[tname] = blob_channels[bname]
                 blob_width[tname] = blob_width[bname]
                 blob_height[tname] = blob_height[bname]
@@ -212,7 +217,10 @@ class CaffeNet(nn.Module):
             elif ltype == 'Pooling':
                 kernel_size = int(layer['pooling_param']['kernel_size'])
                 stride = int(layer['pooling_param']['stride'])
-                models[lname] = nn.MaxPool2d(kernel_size, stride)
+                if stride > 1:
+                    models[lname] = nn.MaxPool2d(kernel_size, stride)
+                else:
+                    models[lname] = MaxPoolStride1()
                 blob_channels[tname] = blob_channels[bname]
                 blob_width[tname] = (blob_width[bname] - kernel_size)/stride + 1
                 blob_height[tname] = (blob_height[bname] - kernel_size)/stride + 1
