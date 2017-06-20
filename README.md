@@ -36,6 +36,7 @@ AP for sofa = 0.4878
 AP for train = 0.7004
 AP for tvmonitor = 0.5754
 Mean AP = 0.5391
+4. python detect.py tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel data/dog.jpg 
 ```
 
 ---
