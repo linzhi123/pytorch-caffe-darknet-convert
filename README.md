@@ -1,13 +1,6 @@
 # caffe-darknet-convert
-python caffe2darknet.py ResNet-50-deploy.prototxt
+Convert between caffe and darknet models.
 
-# Todo
-- [x] convert prototxt to cfg
-- [x] print cfg nicely
-- [ ] load caffemodel
-- [ ] convert caffemodel to darknet weights
-
----
 # Convert darknet to caffe
 ### convert tiny-yolo from darknet to caffe
 ```
