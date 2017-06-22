@@ -112,7 +112,7 @@ def main():
 #            model = resnet_model.resnet50_new(pretrained=True) 
 #            print('save resnet50 to resnet50.weights')
 #            model.saveas_darknet_weights('resnet50.weights')
-        if args.arch == 'resnet50':
+        if args.arch == 'resnet50-darknet':
             from darknet import Darknet
             model = Darknet('cfg/resnet50.cfg')
             print('load weights from resnet50.weights')

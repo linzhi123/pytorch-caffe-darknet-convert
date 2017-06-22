@@ -5,7 +5,7 @@ Convert between pytorch, caffe and darknet models. Caffe darknet models can be l
 ### convert resnet50 from pytorch to darknet
 ```
 1. python pytorch2darknet.py 
-2. python main.py -a resnet50 --pretrained -e /home/xiaohang/ImageNet/
+2. python main.py -a resnet50-darknet --pretrained -e /home/xiaohang/ImageNet/
 => using pre-trained model 'resnet50'
 load weights from resnet50.weights
 Test: [0/196]   Time 16.132 (16.132)    Loss 6.1005 (6.1005)    Prec@1 87.109 (87.109)  Prec@5 97.266 (97.266)
@@ -34,9 +34,11 @@ Test: [190/196] Time 1.367 (0.826)      Loss 6.3394 (6.2196)    Prec@1 67.188 (7
 # Convert darknet to caffe
 ### convert tiny-yolo from darknet to caffe
 ```
-1. python darknet2caffe.py tiny-yolo-voc.cfg tiny-yolo-voc.weights tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel
-2. python valid.py cfg/voc.data tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel
-3. python scripts/voc_eval.py results/comp4_det_test_
+1. download tiny-yolo-voc.weights : https://pjreddie.com/media/files/tiny-yolo-voc.weights
+https://github.com/pjreddie/darknet/blob/master/cfg/tiny-yolo-voc.cfg
+2. python darknet2caffe.py tiny-yolo-voc.cfg tiny-yolo-voc.weights tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel
+3. python valid.py cfg/voc.data tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel
+4. python scripts/voc_eval.py results/comp4_det_test_
 VOC07 metric? Yes
 AP for aeroplane = 0.6094
 AP for bicycle = 0.6781
@@ -59,7 +61,7 @@ AP for sofa = 0.4878
 AP for train = 0.7004
 AP for tvmonitor = 0.5754
 Mean AP = 0.5391
-4. python detect.py tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel data/dog.jpg 
+5. python detect.py tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel data/dog.jpg 
 ```
 
 ### convert tiny-yolo from darknet to caffe without bn
