@@ -129,7 +129,7 @@ def main():
             model.load_weights('ResNet-50-model.weights')
         elif args.arch == 'resnet18-caffe':
             from caffenet import CaffeNet
-            model = CaffeNet('resnet-18.prototxt')
+            model = CaffeNet('cfg/resnet-18.prototxt')
             print('load weights from resnet-18.caffemodel')
             model.load_weights('resnet-18.caffemodel')
         elif args.arch == 'resnet18-darknet':

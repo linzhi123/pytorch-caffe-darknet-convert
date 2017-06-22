@@ -156,7 +156,7 @@ Test: [190/196] Time 1.099 (0.960)      Loss 1.1433 (1.0589)    Prec@1 71.094 (7
  * Prec@1 74.448 Prec@5 91.884
 ```
 
-### convert resnet18
+### convert resnet18 from caffe to darknet
 ```
 1. Download resnet18 from https://github.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet.git and save as resnet-18.caffemodel
 python main.py -a resnet18-caffe --pretrained -e /home/xiaohang/ImageNet/       
@@ -184,7 +184,7 @@ Test: [170/196] Time 0.744 (0.970)      Loss 1.7531 (2.2335)    Prec@1 72.266 (6
 Test: [180/196] Time 1.595 (0.971)      Loss 2.3968 (2.2616)    Prec@1 55.859 (65.392)  Prec@5 85.938 (86.794)
 Test: [190/196] Time 0.795 (0.966)      Loss 3.2117 (2.2588)    Prec@1 50.000 (65.404)  Prec@5 80.078 (86.801)
  * Prec@1 65.580 Prec@5 86.868
-2. python caffe2darknet.py resnet-18.prototxt resnet-18.caffemodel resnet-18.cfg resnet-18.weights
+2. python caffe2darknet.py cfg/resnet-18.prototxt resnet-18.caffemodel resnet-18.cfg resnet-18.weights
 3. python main.py -a resnet18-darknet --pretrained -e /home/xiaohang/ImageNet/
 => using pre-trained model 'resnet18-darknet'
 load weights from resnet-18.weights
