@@ -217,13 +217,24 @@ class CaffeNet(nn.Module):
             elif ltype == 'Pooling':
                 kernel_size = int(layer['pooling_param']['kernel_size'])
                 stride = int(layer['pooling_param']['stride'])
-                if stride > 1:
-                    models[lname] = nn.MaxPool2d(kernel_size, stride)
-                else:
+                pool_type = layer['pooling_param']['pool']
+                if pool_type == 'MAX' and kernel_size == 2 and stride == 1: # for tiny-yolo-voc
                     models[lname] = MaxPoolStride1()
+                    blob_width[tname] = blob_width[bname]
+                    blob_height[tname] = blob_height[bname]
+                else:
+                    if pool_type == 'MAX':
+                        models[lname] = nn.MaxPool2d(kernel_size, stride)
+                    elif pool_type == 'AVE':
+                        models[lname] = nn.AvgPool2d(kernel_size, stride)
+
+                    if stride > 1:
+                        blob_width[tname] = (blob_width[bname] - kernel_size + 1)/stride + 1
+                        blob_height[tname] = (blob_height[bname] - kernel_size + 1)/stride + 1
+                    else:
+                        blob_width[tname] = blob_width[bname] - kernel_size + 1
+                        blob_height[tname] = blob_height[bname] - kernel_size + 1
                 blob_channels[tname] = blob_channels[bname]
-                blob_width[tname] = (blob_width[bname] - kernel_size)/stride + 1
-                blob_height[tname] = (blob_height[bname] - kernel_size)/stride + 1
                 i = i + 1
             elif ltype == 'Eltwise':
                 operation = 'SUM'

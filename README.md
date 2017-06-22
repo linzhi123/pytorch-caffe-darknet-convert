@@ -100,31 +100,34 @@ Mean AP = 0.5391
 ### convert kaiming's resnet50 from caffe to darknet
 ```
 1. download resnet50 from https://github.com/KaimingHe/deep-residual-networks
+ResNet-50-deploy.prototxt: https://github.com/KaimingHe/deep-residual-networks/blob/master/prototxt/ResNet-50-deploy.prototxt
+ResNet-50-model.caffemodel and ResNet_mean.binaryproto : https://onedrive.live.com/?authkey=%21AAFW2-FVoxeVRck&id=4006CBB8476FF777%2117887&cid=4006CBB8476FF777
 python main.py -a resnet50-kaiming --pretrained -e /home/xiaohang/ImageNet/
 => using pre-trained model 'resnet50-kaiming'
 load weights from ResNet-50-model.caffemodel
 Loading caffemodel:  ResNet-50-model.caffemodel
-Test: [0/196]   Time 15.655 (15.655)    Loss 2.9010 (2.9010)    Prec@1 83.203 (83.203)  Prec@5 94.531 (94.531)
-Test: [10/196]  Time 0.635 (1.920)      Loss 4.2648 (3.5170)    Prec@1 73.047 (78.942)  Prec@5 92.188 (93.928)
-Test: [20/196]  Time 0.315 (1.407)      Loss 3.9468 (3.5804)    Prec@1 80.469 (78.609)  Prec@5 89.844 (93.415)
-Test: [30/196]  Time 0.552 (1.284)      Loss 4.3684 (3.3685)    Prec@1 76.953 (79.826)  Prec@5 94.922 (93.687)
-Test: [40/196]  Time 1.464 (1.195)      Loss 3.7958 (3.6040)    Prec@1 74.609 (78.230)  Prec@5 93.750 (93.807)
-Test: [50/196]  Time 0.942 (1.154)      Loss 2.1675 (3.5650)    Prec@1 82.812 (78.079)  Prec@5 96.484 (94.095)
-Test: [60/196]  Time 0.833 (1.112)      Loss 4.8222 (3.6257)    Prec@1 72.266 (77.824)  Prec@5 91.797 (94.185)
-Test: [70/196]  Time 0.473 (1.094)      Loss 3.5255 (3.5499)    Prec@1 76.562 (78.197)  Prec@5 95.312 (94.350)
-Test: [80/196]  Time 1.513 (1.083)      Loss 7.2892 (3.6905)    Prec@1 58.594 (77.701)  Prec@5 82.812 (93.977)
-Test: [90/196]  Time 1.232 (1.071)      Loss 9.4876 (3.9334)    Prec@1 47.656 (76.219)  Prec@5 81.250 (93.128)
-Test: [100/196] Time 0.541 (1.053)      Loss 6.3092 (4.1811)    Prec@1 64.062 (74.737)  Prec@5 87.109 (92.304)
-Test: [110/196] Time 1.355 (1.050)      Loss 4.9908 (4.3116)    Prec@1 66.797 (74.060)  Prec@5 89.844 (91.836)
-Test: [120/196] Time 0.325 (1.043)      Loss 6.1492 (4.3757)    Prec@1 62.891 (73.728)  Prec@5 85.938 (91.561)
-Test: [130/196] Time 2.841 (1.044)      Loss 2.6247 (4.5290)    Prec@1 79.297 (72.951)  Prec@5 94.531 (91.135)
-Test: [140/196] Time 0.328 (1.029)      Loss 4.8094 (4.6045)    Prec@1 69.922 (72.523)  Prec@5 88.672 (90.863)
-Test: [150/196] Time 2.078 (1.026)      Loss 4.9830 (4.6820)    Prec@1 74.219 (72.100)  Prec@5 86.719 (90.537)
-Test: [160/196] Time 0.309 (1.019)      Loss 4.2790 (4.7415)    Prec@1 76.562 (71.793)  Prec@5 88.672 (90.278)
-Test: [170/196] Time 2.491 (1.017)      Loss 3.6188 (4.8237)    Prec@1 77.344 (71.292)  Prec@5 95.703 (90.022)
-Test: [180/196] Time 0.863 (1.007)      Loss 6.5520 (4.8957)    Prec@1 54.688 (70.871)  Prec@5 82.031 (89.742)
-Test: [190/196] Time 1.756 (1.005)      Loss 7.0145 (4.9370)    Prec@1 55.078 (70.505)  Prec@5 82.031 (89.553)
- * Prec@1 70.586 Prec@5 89.572
+convlution conv1 has bias
+Test: [0/196]   Time 15.196 (15.196)    Loss 0.5485 (0.5485)    Prec@1 87.500 (87.500)  Prec@5 96.875 (96.875)
+Test: [10/196]  Time 0.603 (1.851)      Loss 1.0412 (0.7676)    Prec@1 73.828 (80.717)  Prec@5 92.578 (94.567)
+Test: [20/196]  Time 0.359 (1.361)      Loss 0.7243 (0.7656)    Prec@1 85.547 (80.804)  Prec@5 92.969 (94.494)
+Test: [30/196]  Time 0.883 (1.240)      Loss 0.8022 (0.7273)    Prec@1 82.031 (81.981)  Prec@5 95.703 (94.796)
+Test: [40/196]  Time 1.166 (1.159)      Loss 0.8016 (0.7690)    Prec@1 79.297 (80.516)  Prec@5 94.922 (94.779)
+Test: [50/196]  Time 1.490 (1.108)      Loss 0.4365 (0.7552)    Prec@1 89.062 (80.668)  Prec@5 98.047 (95.044)
+Test: [60/196]  Time 0.295 (1.072)      Loss 1.0453 (0.7689)    Prec@1 72.656 (80.277)  Prec@5 93.750 (95.210)
+Test: [70/196]  Time 0.728 (1.064)      Loss 0.7959 (0.7542)    Prec@1 77.344 (80.573)  Prec@5 94.922 (95.384)
+Test: [80/196]  Time 1.314 (1.047)      Loss 1.5740 (0.7775)    Prec@1 62.109 (80.179)  Prec@5 85.938 (95.100)
+Test: [90/196]  Time 1.702 (1.040)      Loss 2.2488 (0.8350)    Prec@1 51.953 (78.979)  Prec@5 82.422 (94.463)
+Test: [100/196] Time 0.300 (1.016)      Loss 1.2809 (0.8886)    Prec@1 69.141 (77.827)  Prec@5 89.844 (93.862)
+Test: [110/196] Time 1.121 (1.011)      Loss 0.9445 (0.9139)    Prec@1 75.000 (77.404)  Prec@5 92.188 (93.567)
+Test: [120/196] Time 0.667 (1.007)      Loss 1.4142 (0.9327)    Prec@1 66.406 (77.079)  Prec@5 86.328 (93.337)
+Test: [130/196] Time 0.915 (0.995)      Loss 0.6773 (0.9680)    Prec@1 81.641 (76.273)  Prec@5 95.312 (92.981)
+Test: [140/196] Time 0.315 (0.989)      Loss 1.1367 (0.9884)    Prec@1 74.219 (75.923)  Prec@5 91.016 (92.758)
+Test: [150/196] Time 0.840 (0.979)      Loss 1.2445 (1.0101)    Prec@1 76.953 (75.492)  Prec@5 88.672 (92.454)
+Test: [160/196] Time 0.324 (0.978)      Loss 0.9249 (1.0276)    Prec@1 80.078 (75.182)  Prec@5 90.234 (92.185)
+Test: [170/196] Time 0.534 (0.967)      Loss 0.6927 (1.0442)    Prec@1 80.859 (74.737)  Prec@5 96.875 (91.954)
+Test: [180/196] Time 0.298 (0.965)      Loss 1.3764 (1.0596)    Prec@1 66.406 (74.350)  Prec@5 91.797 (91.786)
+Test: [190/196] Time 0.414 (0.962)      Loss 1.1433 (1.0589)    Prec@1 71.094 (74.317)  Prec@5 94.531 (91.823)
+ * Prec@1 74.448 Prec@5 91.884
 Kaiming: ResNet-50 24.7% 7.8% (shorter side=256)
 2. python caffe2darknet.py ResNet-50-deploy.prototxt ResNet-50-model.caffemodel ResNet-50-model.cfg ResNet-50-model.weights
 3. python main.py -a resnet50-kaiming-dk --pretrained -e /home/xiaohang/ImageNet/        
@@ -151,7 +154,6 @@ Test: [170/196] Time 1.802 (0.972)      Loss 0.6927 (1.0442)    Prec@1 80.859 (7
 Test: [180/196] Time 1.748 (0.967)      Loss 1.3764 (1.0596)    Prec@1 66.406 (74.350)  Prec@5 91.797 (91.786)
 Test: [190/196] Time 1.099 (0.960)      Loss 1.1433 (1.0589)    Prec@1 71.094 (74.317)  Prec@5 94.531 (91.823)
  * Prec@1 74.448 Prec@5 91.884
-The difference maybe because of the bias in the first conv layer.
 ```
 
 ### convert resnet18
