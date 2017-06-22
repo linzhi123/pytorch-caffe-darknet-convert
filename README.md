@@ -37,7 +37,8 @@ Test: [190/196] Time 1.367 (0.826)      Loss 6.3394 (6.2196)    Prec@1 67.188 (7
 1. download tiny-yolo-voc.weights : https://pjreddie.com/media/files/tiny-yolo-voc.weights
 https://github.com/pjreddie/darknet/blob/master/cfg/tiny-yolo-voc.cfg
 2. python darknet2caffe.py tiny-yolo-voc.cfg tiny-yolo-voc.weights tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel
-3. python valid.py cfg/voc.data tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel
+3. download voc data and process according to https://github.com/marvis/pytorch-yolo2
+python valid.py cfg/voc.data tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel
 4. python scripts/voc_eval.py results/comp4_det_test_
 VOC07 metric? Yes
 AP for aeroplane = 0.6094
