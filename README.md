@@ -30,6 +30,7 @@ Test: [180/196] Time 1.185 (0.828)      Loss 6.3454 (6.2198)    Prec@1 68.750 (7
 Test: [190/196] Time 1.367 (0.826)      Loss 6.3394 (6.2196)    Prec@1 67.188 (75.685)  Prec@5 95.703 (92.752)
  * Prec@1 75.794 Prec@5 92.798
 ```
+imagenet data is processed [as described here](https://github.com/facebook/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset)
 ---
 # Convert darknet to caffe
 ### convert tiny-yolo from darknet to caffe
