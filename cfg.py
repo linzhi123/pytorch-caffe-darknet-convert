@@ -2,6 +2,9 @@ import torch
 from collections import OrderedDict
 
 def parse_cfg(cfgfile):
+    def erase_comment(line):
+        line = line.split('#')[0]
+        return line
     blocks = []
     fp = open(cfgfile, 'r')
     block =  None
@@ -20,6 +23,7 @@ def parse_cfg(cfgfile):
             if block['type'] == 'convolutional':
                 block['batch_normalize'] = 0
         else:
+            line = erase_comment(line)
             key,value = line.split('=')
             key = key.strip()
             if key == 'type':

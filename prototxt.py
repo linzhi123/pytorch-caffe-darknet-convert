@@ -33,6 +33,7 @@ def parse_prototxt(protofile):
             ltype = line_type(line)
             if ltype == 0: # key: value
                 #print line
+                line = line.split('#')[0]
                 key, value = line.split(':')
                 key = key.strip()
                 value = value.strip().strip('"')

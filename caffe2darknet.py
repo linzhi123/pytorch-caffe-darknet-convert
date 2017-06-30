@@ -1,3 +1,5 @@
+#!/home/ubuntu/anaconda2/bin/python -f 
+
 from collections import OrderedDict
 from cfg import *
 from prototxt import *
@@ -21,10 +23,16 @@ def caffe2darknet(protofile, caffemodel):
     blocks = []
     block = OrderedDict()
     block['type'] = 'net'
-    block['batch'] = props['input_dim'][0]
-    block['channels'] = props['input_dim'][1]
-    block['height'] = props['input_dim'][2]
-    block['width'] = props['input_dim'][3]
+    if props.has_key('input_shape'):
+        block['batch'] = props['input_shape']['dim'][0]
+        block['channels'] = props['input_shape']['dim'][1]
+        block['height'] = props['input_shape']['dim'][2]
+        block['width'] = props['input_shape']['dim'][3]
+    else:
+        block['batch'] = props['input_dim'][0]
+        block['channels'] = props['input_dim'][1]
+        block['height'] = props['input_dim'][2]
+        block['width'] = props['input_dim'][3]
     if props.has_key('mean_file'):
         block['mean_file'] = props['mean_file']
     blocks.append(block)
