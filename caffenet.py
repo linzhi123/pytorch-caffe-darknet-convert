@@ -39,8 +39,12 @@ class CaffeNet(nn.Module):
         for name,model in self.models.items():
             self.add_module(name, model)
 
-        self.width = int(self.net_info['props']['input_dim'][3])
-        self.height = int(self.net_info['props']['input_dim'][2])
+        if self.net_info['props'].has_key('input_shape'):
+            self.width = int(self.net_info['props']['input_shape']['dim'][3])
+            self.height = int(self.net_info['props']['input_shape']['dim'][2])
+        else:
+            self.width = int(self.net_info['props']['input_dim'][3])
+            self.height = int(self.net_info['props']['input_dim'][2])
         self.has_mean = False
 
     def forward(self, data):
@@ -93,9 +97,14 @@ class CaffeNet(nn.Module):
             blob.ParseFromString(open(mean_file, 'rb').read())
             mean_img = torch.from_numpy(np.array(blob.data)).float()
 
-            channels = int(self.net_info['props']['input_dim'][1])
-            height = int(self.net_info['props']['input_dim'][2])
-            width = int(self.net_info['props']['input_dim'][3])
+            if self.net_info['props'].has_key('input_shape'):
+                channels = int(self.net_info['props']['input_shape']['dim'][1])
+                height = int(self.net_info['props']['input_shape']['dim'][2])
+                width = int(self.net_info['props']['input_shape']['dim'][3])
+            else:
+                channels = int(self.net_info['props']['input_dim'][1])
+                height = int(self.net_info['props']['input_dim'][2])
+                width = int(self.net_info['props']['input_dim'][3])
             mean_img = mean_img.view(channels, height, width)#.mean(0)
             #mean_img = mean_img.repeat(3, 1, 1)
             self.register_buffer('mean_img', torch.zeros(channels, height, width))
@@ -161,9 +170,14 @@ class CaffeNet(nn.Module):
         props = net_info['props']
         layer_num = len(layers)
 
-        blob_channels['data'] = int(props['input_dim'][1])
-        blob_height['data'] = int(props['input_dim'][2])
-        blob_width['data'] = int(props['input_dim'][3])
+        if props.has_key('input_shape'):
+            blob_channels['data'] = int(props['input_shape']['dim'][1])
+            blob_height['data'] = int(props['input_shape']['dim'][2])
+            blob_width['data'] = int(props['input_shape']['dim'][3])
+        else:
+            blob_channels['data'] = int(props['input_dim'][1])
+            blob_height['data'] = int(props['input_dim'][2])
+            blob_width['data'] = int(props['input_dim'][3])
         i = 0
         while i < layer_num:
             layer = layers[i]
