@@ -118,10 +118,8 @@ def caffe2darknet(protofile, caffemodel):
             block['from'] = str(from_id)
             assert(i+1 < layer_num and layers[i+1]['type'] == 'ReLU')
             block['activation'] = 'relu'
-            top = layer['top']
-            top2 = layers[i+1]['top']
+            top = layers[i+1]['top']
             layer_id[top] = len(blocks)
-            layer_id[top2] = len(blocks)
             blocks.append(block)
             i = i + 2
         elif layer['type'] == 'InnerProduct':
