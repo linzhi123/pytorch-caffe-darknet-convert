@@ -63,6 +63,8 @@ def caffe2darknet(protofile, caffemodel):
             last_layer = conv_layer 
             m_conv_layer = lmap[conv_layer['name']] 
             if i+2 < layer_num and layers[i+1]['type'] == 'BatchNorm' and layers[i+2]['type'] == 'Scale':
+                print i+1,layers[i+1]['name'], layers[i+1]['type']
+                print i+2,layers[i+2]['name'], layers[i+2]['type']
                 block['batch_normalize'] = '1'
                 bn_layer = layers[i+1]
                 scale_layer = layers[i+2]
@@ -79,18 +81,19 @@ def caffe2darknet(protofile, caffemodel):
             wdata += list(m_conv_layer.blobs[0].data)       ## conv_weights
             
             if i+1 < layer_num and layers[i+1]['type'] == 'ReLU':
+                print i+1,layers[i+1]['name'], layers[i+1]['type']
                 act_layer = layers[i+1]
                 block['activation'] = 'relu'
                 top = act_layer['top']
                 layer_id[top] = len(blocks)
                 blocks.append(block)
-                i = i + 2
+                i = i + 1
             else:
                 block['activation'] = 'linear'
                 top = last_layer['top']
                 layer_id[top] = len(blocks)
                 blocks.append(block)
-                i = i + 1
+            i = i + 1
         elif layer['type'] == 'Pooling':
             assert(layer_id[layer['bottom']] == len(blocks)-1)
             block = OrderedDict()
@@ -116,7 +119,9 @@ def caffe2darknet(protofile, caffemodel):
             assert(i+1 < layer_num and layers[i+1]['type'] == 'ReLU')
             block['activation'] = 'relu'
             top = layer['top']
+            top2 = layers[i+1]['top']
             layer_id[top] = len(blocks)
+            layer_id[top2] = len(blocks)
             blocks.append(block)
             i = i + 2
         elif layer['type'] == 'InnerProduct':
