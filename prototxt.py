@@ -115,6 +115,9 @@ def print_prototxt(net_info):
         for key,value in block_info.items():
             if type(value) == OrderedDict:
                 print_block(value, key, indent+4)
+            elif type(value) == list:
+                for v in value:
+                    print('%s    %s: %s' % (blanks, key, format_value(v)))
             else:
                 print('%s    %s: %s' % (blanks, key, format_value(value)))
         print('%s}' % blanks)
@@ -150,6 +153,9 @@ def save_prototxt(net_info, protofile, region=True):
         for key,value in block_info.items():
             if type(value) == OrderedDict:
                 print_block(value, key, indent+4)
+            elif type(value) == list:
+                for v in value:
+                    print >> fp, '%s    %s: %s' % (blanks, key, format_value(v))
             else:
                 print >> fp, '%s    %s: %s' % (blanks, key, format_value(value))
         print >> fp, '%s}' % blanks
