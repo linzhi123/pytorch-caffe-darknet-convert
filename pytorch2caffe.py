@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import torch
 from torch.autograd import Variable
 from prototxt import *
+import caffe
 
 layer_dict = {'ConvNdBackward'   : 'Convolution',
               'ThresholdBackward': 'ReLU',
@@ -11,6 +12,50 @@ layer_dict = {'ConvNdBackward'   : 'Convolution',
               'DropoutBackward'  : 'Dropout',
               'AddmmBackward'    : 'InnerProduct',
               'ViewBackward'     : 'Reshape'}
+
+def pytorch2caffe(model, x, protofile, caffemodel):
+    net_info = pytorch2prototxt(model, x)
+    save_prototxt(net_info, protofile)
+
+    net = caffe.Net(protofile, caffe.TEST)
+    params = net.params
+
+    var = model(x)
+
+    def convert_layer(func):
+        parent_type = str(type(func).__name__)
+        parent_name = parent_type+str(id(func))
+        parent_bottoms = []
+        parent_top = parent_name
+
+        if hasattr(func, 'next_functions'):
+            for u in func.next_functions:
+                if u[0] is not None:
+                    child_type = str(type(u[0]).__name__)
+                    child_name = child_type + str(id(u[0]))
+                    if child_type != 'AccumulateGrad' and (parent_type != 'AddmmBackward' or child_type != 'TransposeBackward'):
+                        convert_layer(u[0])
+
+        if parent_type == 'ConvNdBackward':
+            weights = func.next_functions[1][0].variable
+            biases = func.next_functions[2][0].variable
+            save_conv2caffe(weights, biases, params[parent_name])
+        elif parent_type == 'AddmmBackward':
+            weights = func.saved_tensors[0]
+            biases = func.saved_tensors[1]
+            save_fc2caffe(weights, biases, params[parent_name])
+    
+    convert_layer(var.grad_fn)
+    print('save caffemodel to %s' % caffemodel)
+    net.save(caffemodel)
+
+def save_conv2caffe(weights, biases, conv_param):
+    conv_param[1].data[...] = biases.numpy() 
+    conv_param[0].data[...] = weights.numpy() 
+
+def save_fc2caffe(weights, biases, conv_param):
+    conv_param[1].data[...] = biases.numpy() 
+    conv_param[0].data[...] = weights.numpy() 
 
 def pytorch2prototxt(model, x):
     net_info = OrderedDict()
@@ -111,3 +156,5 @@ if __name__ == '__main__':
     x = Variable(torch.rand(1, 3, 227, 227))
     net_info = pytorch2prototxt(m, x) 
     print_prototxt(net_info)
+
+    pytorch2caffe(m, x, 'out.prototxt', 'out.caffemodel')
