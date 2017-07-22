@@ -16,9 +16,9 @@ layer_dict = {'ConvNdBackward'   : 'Convolution',
               'ViewBackward'     : 'Reshape'}
 
 layer_id = 0
-def pytorch2caffe(var, protofile, caffemodel):
+def pytorch2caffe(input_var, output_var, protofile, caffemodel):
     global layer_id
-    net_info = pytorch2prototxt(var)
+    net_info = pytorch2prototxt(input_var, output_var)
     print_prototxt(net_info)
     save_prototxt(net_info, protofile)
 
@@ -51,7 +51,7 @@ def pytorch2caffe(var, protofile, caffemodel):
     
         if parent_type != 'ViewBackward':
             layer_id = layer_id + 1
-    convert_layer(var.grad_fn)
+    convert_layer(output_var.grad_fn)
     print('save caffemodel to %s' % caffemodel)
     net.save(caffemodel)
 
@@ -67,13 +67,13 @@ def save_fc2caffe(weights, biases, fc_param):
     fc_param[0].data[...] = weights.numpy() 
 
 #def pytorch2prototxt(model, x, var):
-def pytorch2prototxt(var):
+def pytorch2prototxt(input_var, output_var):
     global layer_id
     net_info = OrderedDict()
     props = OrderedDict()
     props['name'] = 'pytorch'
     props['input'] = 'data'
-    props['input_dim'] = x.size()
+    props['input_dim'] = input_var.size()
     
     layers = []
 
@@ -135,7 +135,7 @@ def pytorch2prototxt(var):
             layer_id = layer_id + 1
         return parent_top
     
-    add_layer(var.grad_fn)
+    add_layer(output_var.grad_fn)
     net_info['props'] = props
     net_info['layers'] = layers
     return net_info
@@ -167,7 +167,7 @@ if __name__ == '__main__':
 
     m = torchvision.models.alexnet()
     print(m)
-    x = Variable(torch.rand(1, 3, 227, 227))
-    var = m(x)
+    input_var = Variable(torch.rand(1, 3, 227, 227))
+    output_var = m(input_var)
 
-    pytorch2caffe(var, 'out.prototxt', 'out.caffemodel')
+    pytorch2caffe(input_var, output_var, 'out.prototxt', 'out.caffemodel')
