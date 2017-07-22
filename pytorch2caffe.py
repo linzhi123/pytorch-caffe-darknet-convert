@@ -1,10 +1,12 @@
+import sys
+sys.path.append('/data/xiaohang/caffe/python')
+import caffe
 from collections import OrderedDict
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
 from torch.autograd import Variable
 from prototxt import *
-import caffe
 
 layer_dict = {'ConvNdBackward'   : 'Convolution',
               'ThresholdBackward': 'ReLU',
@@ -13,20 +15,20 @@ layer_dict = {'ConvNdBackward'   : 'Convolution',
               'AddmmBackward'    : 'InnerProduct',
               'ViewBackward'     : 'Reshape'}
 
-def pytorch2caffe(model, x, protofile, caffemodel):
-    net_info = pytorch2prototxt(model, x)
+def pytorch2caffe(var, protofile, caffemodel):
+    net_info = pytorch2prototxt(var)
+    print_prototxt(net_info)
     save_prototxt(net_info, protofile)
 
     net = caffe.Net(protofile, caffe.TEST)
     params = net.params
-
-    var = model(x)
 
     def convert_layer(func):
         parent_type = str(type(func).__name__)
         parent_name = parent_type+str(id(func))
         parent_bottoms = []
         parent_top = parent_name
+        print('parent_name = ', parent_name)
 
         if hasattr(func, 'next_functions'):
             for u in func.next_functions:
@@ -50,6 +52,9 @@ def pytorch2caffe(model, x, protofile, caffemodel):
     net.save(caffemodel)
 
 def save_conv2caffe(weights, biases, conv_param):
+    print(type(conv_param))
+    print(type(weights))
+    print(type(biases))
     conv_param[1].data[...] = biases.numpy() 
     conv_param[0].data[...] = weights.numpy() 
 
@@ -57,7 +62,8 @@ def save_fc2caffe(weights, biases, conv_param):
     conv_param[1].data[...] = biases.numpy() 
     conv_param[0].data[...] = weights.numpy() 
 
-def pytorch2prototxt(model, x):
+#def pytorch2prototxt(model, x, var):
+def pytorch2prototxt(var):
     net_info = OrderedDict()
     props = OrderedDict()
     props['name'] = 'pytorch'
@@ -66,7 +72,7 @@ def pytorch2prototxt(model, x):
     
     layers = []
 
-    var = model(x)
+    #var = model(x)
 
     def add_layer(func):
         parent_type = str(type(func).__name__)
@@ -154,7 +160,6 @@ if __name__ == '__main__':
     m = torchvision.models.alexnet()
     print(m)
     x = Variable(torch.rand(1, 3, 227, 227))
-    net_info = pytorch2prototxt(m, x) 
-    print_prototxt(net_info)
+    var = m(x)
 
-    pytorch2caffe(m, x, 'out.prototxt', 'out.caffemodel')
+    pytorch2caffe(var, 'out.prototxt', 'out.caffemodel')
