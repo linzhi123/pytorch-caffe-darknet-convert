@@ -1,5 +1,10 @@
 # pytorch-caffe-darknet-convert
 Convert between pytorch, caffe and darknet models. Caffe darknet models can be load directly by pytorch.
+- [x] caffe2darknet
+- [x] darknet2caffe
+- [x] pytorch2caffe
+- [ ] tf2caffe
+- [ ] mxnet2caffe
 
 # Convert pytorch to darknet
 ### convert resnet50 from pytorch to darknet
