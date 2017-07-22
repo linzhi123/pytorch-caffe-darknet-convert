@@ -15,7 +15,9 @@ layer_dict = {'ConvNdBackward'   : 'Convolution',
               'AddmmBackward'    : 'InnerProduct',
               'ViewBackward'     : 'Reshape'}
 
+layer_id = 0
 def pytorch2caffe(var, protofile, caffemodel):
+    global layer_id
     net_info = pytorch2prototxt(var)
     print_prototxt(net_info)
     save_prototxt(net_info, protofile)
@@ -23,30 +25,32 @@ def pytorch2caffe(var, protofile, caffemodel):
     net = caffe.Net(protofile, caffe.TEST)
     params = net.params
 
+    layer_id = 1
     def convert_layer(func):
+        global layer_id
         parent_type = str(type(func).__name__)
-        parent_name = parent_type+str(id(func))
         parent_bottoms = []
-        parent_top = parent_name
-        print('parent_name = ', parent_name)
 
         if hasattr(func, 'next_functions'):
             for u in func.next_functions:
                 if u[0] is not None:
                     child_type = str(type(u[0]).__name__)
-                    child_name = child_type + str(id(u[0]))
+                    child_name = child_type + str(layer_id)
                     if child_type != 'AccumulateGrad' and (parent_type != 'AddmmBackward' or child_type != 'TransposeBackward'):
                         convert_layer(u[0])
 
+        parent_name = parent_type+str(layer_id)
         if parent_type == 'ConvNdBackward':
-            weights = func.next_functions[1][0].variable
-            biases = func.next_functions[2][0].variable
+            weights = func.next_functions[1][0].variable.data
+            biases = func.next_functions[2][0].variable.data
             save_conv2caffe(weights, biases, params[parent_name])
         elif parent_type == 'AddmmBackward':
-            weights = func.saved_tensors[0]
-            biases = func.saved_tensors[1]
+            biases = func.next_functions[0][0].variable.data
+            weights = func.next_functions[2][0].next_functions[0][0].variable.data
             save_fc2caffe(weights, biases, params[parent_name])
     
+        if parent_type != 'ViewBackward':
+            layer_id = layer_id + 1
     convert_layer(var.grad_fn)
     print('save caffemodel to %s' % caffemodel)
     net.save(caffemodel)
@@ -58,12 +62,13 @@ def save_conv2caffe(weights, biases, conv_param):
     conv_param[1].data[...] = biases.numpy() 
     conv_param[0].data[...] = weights.numpy() 
 
-def save_fc2caffe(weights, biases, conv_param):
-    conv_param[1].data[...] = biases.numpy() 
-    conv_param[0].data[...] = weights.numpy() 
+def save_fc2caffe(weights, biases, fc_param):
+    fc_param[1].data[...] = biases.numpy() 
+    fc_param[0].data[...] = weights.numpy() 
 
 #def pytorch2prototxt(model, x, var):
 def pytorch2prototxt(var):
+    global layer_id
     net_info = OrderedDict()
     props = OrderedDict()
     props['name'] = 'pytorch'
@@ -72,34 +77,36 @@ def pytorch2prototxt(var):
     
     layers = []
 
-    #var = model(x)
-
+    layer_id = 1
     def add_layer(func):
+        global layer_id
         parent_type = str(type(func).__name__)
-        parent_name = parent_type+str(id(func))
         parent_bottoms = []
-        parent_top = parent_name
 
-        layer = OrderedDict()
-        layer['name'] = parent_name
-        layer['type'] = layer_dict[parent_type]
         if hasattr(func, 'next_functions'):
             for u in func.next_functions:
                 if u[0] is not None:
                     child_type = str(type(u[0]).__name__)
-                    child_name = child_type + str(id(u[0]))
+                    child_name = child_type + str(layer_id)
                     if child_type != 'AccumulateGrad' and (parent_type != 'AddmmBackward' or child_type != 'TransposeBackward'):
                         top_name = add_layer(u[0])
                         parent_bottoms.append(top_name)
 
+        parent_name = parent_type+str(layer_id)
+        layer = OrderedDict()
+        layer['name'] = parent_name
+        layer['type'] = layer_dict[parent_type]
+        parent_top = parent_name
         if len(parent_bottoms) > 0:
             layer['bottom'] = parent_bottoms 
         else:
             layer['bottom'] = ['data']
+        layer['top'] = parent_top
         if parent_type == 'ConvNdBackward':
             weights = func.next_functions[1][0].variable
             conv_param = OrderedDict()
             conv_param['num_output'] = weights.size(0)
+            conv_param['pad'] = func.padding[0]
             conv_param['kernel_size'] = weights.size(2)
             conv_param['stride'] = func.stride[0]
             layer['convolution_param'] = conv_param
@@ -125,6 +132,7 @@ def pytorch2prototxt(var):
         layer['top'] = parent_top
         if parent_type != 'ViewBackward':
             layers.append(layer)
+            layer_id = layer_id + 1
         return parent_top
     
     add_layer(var.grad_fn)
