@@ -6,8 +6,6 @@ Convert between pytorch, caffe and darknet models. Caffe darknet models can be l
 - [x] caffe2darknet
 - [x] pytorch2caffe
 - [x] pytorch2darknet : pytorch2caffe then caffe2darknet
-- [ ] tf2caffe: convert meta graph to caffe
-- [ ] mxnet2caffe
 
 # Convert pytorch to darknet
 ### convert resnet50 from pytorch to darknet
