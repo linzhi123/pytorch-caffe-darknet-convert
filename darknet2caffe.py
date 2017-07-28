@@ -44,11 +44,20 @@ def darknet2caffe(cfgfile, weightfile, protofile, caffemodel):
             else:
                 start = load_conv2caffe(buf, start, params[conv_layer_name])
             layer_id = layer_id+1
+        elif block['type'] == 'connected':
+            if block.has_key('name'):
+                fc_layer_name = block['name']
+            else:
+                fc_layer_name = 'layer%d-fc' % layer_id
+            start = load_fc2caffe(buf, start, params[fc_layer_name])
+            layer_id = layer_id+1
         elif block['type'] == 'maxpool':
             layer_id = layer_id+1
         elif block['type'] == 'avgpool':
             layer_id = layer_id+1
         elif block['type'] == 'region':
+            layer_id = layer_id + 1
+        elif block['type'] == 'route':
             layer_id = layer_id + 1
         else:
             print('unknow layer type %s ' % block['type'])
@@ -64,6 +73,14 @@ def load_conv2caffe(buf, start, conv_param):
     conv_param[1].data[...] = np.reshape(buf[start:start+bias.size], bias.shape);   start = start + bias.size
     conv_param[0].data[...] = np.reshape(buf[start:start+weight.size], weight.shape); start = start + weight.size
     return start
+
+def load_fc2caffe(buf, start, fc_param):
+    weight = fc_param[0].data
+    bias = fc_param[1].data
+    fc_param[1].data[...] = np.reshape(buf[start:start+bias.size], bias.shape);   start = start + bias.size
+    fc_param[0].data[...] = np.reshape(buf[start:start+weight.size], weight.shape); start = start + weight.size
+    return start
+
 
 def load_conv_bn2caffe(buf, start, conv_param, bn_param, scale_param):
     conv_weight = conv_param[0].data
@@ -87,6 +104,7 @@ def cfg2prototxt(cfgfile):
     props = OrderedDict() 
     bottom = 'data'
     layer_id = 1
+    topnames = dict()
     for block in blocks:
         if block['type'] == 'net':
             props['name'] = 'Darkent2Caffe'
@@ -161,6 +179,7 @@ def cfg2prototxt(cfgfile):
                     relu_param['negative_slope'] = '0.1'
                     relu_layer['relu_param'] = relu_param
                 layers.append(relu_layer)
+            topnames[layer_id] = bottom
             layer_id = layer_id+1
         elif block['type'] == 'maxpool':
             max_layer = OrderedDict()
@@ -179,6 +198,7 @@ def cfg2prototxt(cfgfile):
             max_layer['pooling_param'] = pooling_param
             layers.append(max_layer)
             bottom = max_layer['top']
+            topnames[layer_id] = bottom
             layer_id = layer_id+1
         elif block['type'] == 'avgpool':
             avg_layer = OrderedDict()
@@ -197,6 +217,7 @@ def cfg2prototxt(cfgfile):
             avg_layer['pooling_param'] = pooling_param
             layers.append(avg_layer)
             bottom = avg_layer['top']
+            topnames[layer_id] = bottom
             layer_id = layer_id+1
         elif block['type'] == 'region':
             if True:
@@ -216,9 +237,48 @@ def cfg2prototxt(cfgfile):
                 region_layer['region_param'] = region_param
                 layers.append(region_layer)
                 bottom = region_layer['top']
+            topnames[layer_id] = bottom
             layer_id = layer_id + 1
+        elif block['type'] == 'route':
+            prev_layer_id = layer_id + int(block['layers'])
+            bottom = topnames[prev_layer_id]
+            topnames[layer_id] = bottom
+            layer_id = layer_id + 1
+        elif block['type'] == 'connected':
+            fc_layer = OrderedDict()
+            fc_layer['bottom'] = bottom
+            if block.has_key('name'):
+                fc_layer['top'] = block['name']
+                fc_layer['name'] = block['name']
+            else:
+                fc_layer['top'] = 'layer%d-fc' % layer_id
+                fc_layer['name'] = 'layer%d-fc' % layer_id
+            fc_layer['type'] = 'InnerProduct'
+            fc_param = OrderedDict()
+            fc_param['num_output'] = int(block['output'])
+            fc_layer['inner_product_param'] = fc_param
+            layers.append(fc_layer)
+            bottom = fc_layer['top']
+
+            if block['activation'] != 'linear':
+                relu_layer = OrderedDict()
+                relu_layer['bottom'] = bottom
+                relu_layer['top'] = bottom
+                if block.has_key('name'):
+                    relu_layer['name'] = '%s-act' % block['name']
+                else:
+                    relu_layer['name'] = 'layer%d-act' % layer_id
+                relu_layer['type'] = 'ReLU'
+                if block['activation'] == 'leaky':
+                    relu_param = OrderedDict()
+                    relu_param['negative_slope'] = '0.1'
+                    relu_layer['relu_param'] = relu_param
+                layers.append(relu_layer)
+            topnames[layer_id] = bottom
+            layer_id = layer_id+1
         else:
             print('unknow layer type %s ' % block['type'])
+            topnames[layer_id] = bottom
             layer_id = layer_id + 1
 
     net_info = OrderedDict()
