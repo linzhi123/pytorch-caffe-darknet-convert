@@ -122,6 +122,11 @@ def main():
             model = CaffeNet('resnet50-pytorch2caffe.prototxt')
             print('load weights resnet50-pytorch2caffe.caffemodel')
             model.load_weights('resnet50-pytorch2caffe.caffemodel')
+        elif args.arch == 'resnet50-darknet2caffe':
+            from caffenet import CaffeNet
+            model = CaffeNet('resnet50-darknet2caffe.prototxt')
+            print('load weights resnet50-darknet2caffe.caffemodel')
+            model.load_weights('resnet50-darknet2caffe.caffemodel')
         elif args.arch == 'resnet50-kaiming':
             from caffenet import CaffeNet
             model = CaffeNet('ResNet-50-deploy.prototxt')

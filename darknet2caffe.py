@@ -59,6 +59,12 @@ def darknet2caffe(cfgfile, weightfile, protofile, caffemodel):
             layer_id = layer_id + 1
         elif block['type'] == 'route':
             layer_id = layer_id + 1
+        elif block['type'] == 'shortcut':
+            layer_id = layer_id + 1
+        elif block['type'] == 'softmax':
+            layer_id = layer_id + 1
+        elif block['type'] == 'cost':
+            layer_id = layer_id + 1
         else:
             print('unknow layer type %s ' % block['type'])
             layer_id = layer_id + 1
@@ -244,6 +250,43 @@ def cfg2prototxt(cfgfile):
             bottom = topnames[prev_layer_id]
             topnames[layer_id] = bottom
             layer_id = layer_id + 1
+        elif block['type'] == 'shortcut':
+            prev_layer_id1 = layer_id + int(block['from'])
+            prev_layer_id2 = layer_id - 1
+            bottom1 = topnames[prev_layer_id1]
+            bottom2= topnames[prev_layer_id2]
+            shortcut_layer = OrderedDict()
+            shortcut_layer['bottom'] = [bottom1, bottom2]
+            if block.has_key('name'):
+                shortcut_layer['top'] = block['name']
+                shortcut_layer['name'] = block['name']
+            else:
+                shortcut_layer['top'] = 'layer%d-shortcut' % layer_id
+                shortcut_layer['name'] = 'layer%d-shortcut' % layer_id
+            shortcut_layer['type'] = 'Eltwise'
+            eltwise_param = OrderedDict()
+            eltwise_param['operation'] = 'SUM'
+            shortcut_layer['eltwise_param'] = eltwise_param
+            layers.append(shortcut_layer)
+            bottom = shortcut_layer['top']
+ 
+            if block['activation'] != 'linear':
+                relu_layer = OrderedDict()
+                relu_layer['bottom'] = bottom
+                relu_layer['top'] = bottom
+                if block.has_key('name'):
+                    relu_layer['name'] = '%s-act' % block['name']
+                else:
+                    relu_layer['name'] = 'layer%d-act' % layer_id
+                relu_layer['type'] = 'ReLU'
+                if block['activation'] == 'leaky':
+                    relu_param = OrderedDict()
+                    relu_param['negative_slope'] = '0.1'
+                    relu_layer['relu_param'] = relu_param
+                layers.append(relu_layer)
+            topnames[layer_id] = bottom
+            layer_id = layer_id+1           
+            
         elif block['type'] == 'connected':
             fc_layer = OrderedDict()
             fc_layer['bottom'] = bottom

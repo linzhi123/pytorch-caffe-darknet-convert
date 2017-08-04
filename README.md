@@ -7,6 +7,67 @@ Convert between pytorch, caffe and darknet models. Caffe darknet models can be l
 - [x] pytorch2caffe
 - [x] pytorch2darknet : pytorch2caffe then caffe2darknet
 
+# Convert pytorch to darknet
+### convert resnet50 from pytorch to darknet and then to caffe
+```
+1. python pytorch2darknet.py 
+2. python main.py -a resnet50-darknet --pretrained -e /home/xiaohang/ImageNet/
+=> using pre-trained model 'resnet50'
+load weights from resnet50.weights
+Test: [0/196]   Time 16.132 (16.132)    Loss 6.1005 (6.1005)    Prec@1 87.109 (87.109)  Prec@5 97.266 (97.266)
+Test: [10/196]  Time 0.387 (1.803)      Loss 6.2117 (6.1357)    Prec@1 77.734 (82.670)  Prec@5 91.797 (95.455)
+Test: [20/196]  Time 0.275 (1.261)      Loss 6.1050 (6.1402)    Prec@1 84.375 (82.236)  Prec@5 92.969 (95.424)
+Test: [30/196]  Time 0.162 (1.123)      Loss 6.1675 (6.1257)    Prec@1 80.469 (83.543)  Prec@5 95.312 (95.817)
+Test: [40/196]  Time 0.889 (1.024)      Loss 6.1888 (6.1483)    Prec@1 81.250 (82.012)  Prec@5 96.875 (95.770)
+Test: [50/196]  Time 0.164 (0.970)      Loss 6.0900 (6.1520)    Prec@1 88.281 (81.794)  Prec@5 97.656 (95.956)
+Test: [60/196]  Time 0.380 (0.933)      Loss 6.1949 (6.1566)    Prec@1 76.172 (81.416)  Prec@5 93.359 (95.946)
+Test: [70/196]  Time 0.427 (0.916)      Loss 6.2009 (6.1525)    Prec@1 78.516 (81.679)  Prec@5 96.484 (96.099)
+Test: [80/196]  Time 0.910 (0.900)      Loss 6.3763 (6.1584)    Prec@1 60.938 (81.134)  Prec@5 88.672 (95.751)
+Test: [90/196]  Time 1.035 (0.896)      Loss 6.4143 (6.1703)    Prec@1 55.078 (80.039)  Prec@5 86.328 (95.175)
+Test: [100/196] Time 0.162 (0.871)      Loss 6.3073 (6.1831)    Prec@1 68.359 (78.968)  Prec@5 91.406 (94.609)
+Test: [110/196] Time 0.658 (0.867)      Loss 6.1750 (6.1885)    Prec@1 76.953 (78.442)  Prec@5 94.922 (94.327)
+Test: [120/196] Time 0.165 (0.861)      Loss 6.2904 (6.1919)    Prec@1 71.094 (78.141)  Prec@5 88.281 (94.034)
+Test: [130/196] Time 1.751 (0.858)      Loss 6.1702 (6.2008)    Prec@1 81.250 (77.290)  Prec@5 94.141 (93.702)
+Test: [140/196] Time 0.163 (0.849)      Loss 6.2442 (6.2045)    Prec@1 75.000 (76.948)  Prec@5 90.625 (93.448)
+Test: [150/196] Time 2.031 (0.846)      Loss 6.1890 (6.2082)    Prec@1 76.953 (76.604)  Prec@5 91.016 (93.189)
+Test: [160/196] Time 0.161 (0.837)      Loss 6.1399 (6.2109)    Prec@1 86.719 (76.366)  Prec@5 94.531 (92.998)
+Test: [170/196] Time 1.687 (0.835)      Loss 6.1388 (6.2159)    Prec@1 82.812 (75.959)  Prec@5 97.656 (92.848)
+Test: [180/196] Time 1.185 (0.828)      Loss 6.3454 (6.2198)    Prec@1 68.750 (75.650)  Prec@5 91.797 (92.705)
+Test: [190/196] Time 1.367 (0.826)      Loss 6.3394 (6.2196)    Prec@1 67.188 (75.685)  Prec@5 95.703 (92.752)
+ * Prec@1 75.794 Prec@5 92.798
+3. python darknet2caffe.py cfg/resnet50.cfg resnet50.weights resnet50-darknet2caffe.prototxt resnet50-darknet2caffe.caffemodel
+4. python main.py -a resnet50-darknet2caffe --pretrained -e /home/xiaohang/ImageNet/        
+=> using pre-trained model 'resnet50-darknet2caffe'
+load weights resnet50-darknet2caffe.caffemodel
+Loading caffemodel:  resnet50-darknet2caffe.caffemodel
+/home/temp/pytorch-caffe-darknet-convert/caffenet.py:135: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
+  self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
+/home/temp/pytorch-caffe-darknet-convert/caffenet.py:149: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
+  self.models[lname][1].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
+Test: [0/196]   Time 14.735 (14.735)    Loss 0.4912 (0.4912)    Prec@1 87.109 (87.109)  Prec@5 97.266 (97.266)
+Test: [10/196]  Time 0.719 (1.715)      Loss 0.9875 (0.6734)    Prec@1 77.734 (82.670)  Prec@5 91.797 (95.455)
+Test: [20/196]  Time 0.305 (1.212)      Loss 0.7830 (0.6867)    Prec@1 84.375 (82.236)  Prec@5 92.969 (95.424)
+Test: [30/196]  Time 1.480 (1.099)      Loss 0.7844 (0.6376)    Prec@1 80.469 (83.543)  Prec@5 95.312 (95.817)
+Test: [40/196]  Time 0.158 (0.993)      Loss 0.6790 (0.6838)    Prec@1 81.250 (82.012)  Prec@5 96.875 (95.770)
+Test: [50/196]  Time 0.838 (0.963)      Loss 0.4856 (0.6827)    Prec@1 88.281 (81.794)  Prec@5 97.656 (95.956)
+Test: [60/196]  Time 0.150 (0.917)      Loss 0.9471 (0.6975)    Prec@1 76.172 (81.416)  Prec@5 93.359 (95.946)
+Test: [70/196]  Time 0.364 (0.912)      Loss 0.7462 (0.6853)    Prec@1 78.516 (81.679)  Prec@5 96.484 (96.099)
+Test: [80/196]  Time 0.880 (0.894)      Loss 1.4552 (0.7138)    Prec@1 60.938 (81.134)  Prec@5 88.672 (95.751)
+Test: [90/196]  Time 1.459 (0.889)      Loss 1.8542 (0.7645)    Prec@1 55.078 (80.039)  Prec@5 86.328 (95.175)
+Test: [100/196] Time 0.153 (0.868)      Loss 1.1526 (0.8163)    Prec@1 68.359 (78.968)  Prec@5 91.406 (94.609)
+Test: [110/196] Time 1.365 (0.869)      Loss 0.8892 (0.8415)    Prec@1 76.953 (78.442)  Prec@5 94.922 (94.327)
+Test: [120/196] Time 0.255 (0.857)      Loss 1.2553 (0.8611)    Prec@1 71.094 (78.141)  Prec@5 88.281 (94.034)
+Test: [130/196] Time 2.089 (0.857)      Loss 0.7045 (0.8950)    Prec@1 81.250 (77.290)  Prec@5 94.141 (93.702)
+Test: [140/196] Time 0.152 (0.844)      Loss 1.0672 (0.9143)    Prec@1 75.000 (76.948)  Prec@5 90.625 (93.448)
+Test: [150/196] Time 2.111 (0.843)      Loss 1.0398 (0.9322)    Prec@1 76.953 (76.604)  Prec@5 91.016 (93.189)
+Test: [160/196] Time 0.152 (0.832)      Loss 0.6951 (0.9459)    Prec@1 86.719 (76.366)  Prec@5 94.531 (92.998)
+Test: [170/196] Time 1.424 (0.832)      Loss 0.6170 (0.9633)    Prec@1 82.812 (75.959)  Prec@5 97.656 (92.848)
+Test: [180/196] Time 1.092 (0.825)      Loss 1.3081 (0.9790)    Prec@1 68.750 (75.650)  Prec@5 91.797 (92.705)
+Test: [190/196] Time 0.611 (0.821)      Loss 1.1691 (0.9769)    Prec@1 67.188 (75.685)  Prec@5 95.703 (92.752)
+ * Prec@1 75.794 Prec@5 92.798
+```
+imagenet data is processed [as described here](https://github.com/facebook/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset)
+
 # Convert pytorch to caffe
 ### convert resnet50 from pytorch to caffe
 ```
@@ -44,36 +105,12 @@ Test: [190/196] Time 0.680 (0.844)      Loss 1.1804 (1.0279)    Prec@1 65.234 (7
 ```
 Note: the result is slightly different from the result below, still checking ...
 
-# Convert pytorch to darknet
-### convert resnet50 from pytorch to darknet
+
+### convert resnet50 from darknet to caffe
 ```
-1. python pytorch2darknet.py 
-2. python main.py -a resnet50-darknet --pretrained -e /home/xiaohang/ImageNet/
-=> using pre-trained model 'resnet50'
-load weights from resnet50.weights
-Test: [0/196]   Time 16.132 (16.132)    Loss 6.1005 (6.1005)    Prec@1 87.109 (87.109)  Prec@5 97.266 (97.266)
-Test: [10/196]  Time 0.387 (1.803)      Loss 6.2117 (6.1357)    Prec@1 77.734 (82.670)  Prec@5 91.797 (95.455)
-Test: [20/196]  Time 0.275 (1.261)      Loss 6.1050 (6.1402)    Prec@1 84.375 (82.236)  Prec@5 92.969 (95.424)
-Test: [30/196]  Time 0.162 (1.123)      Loss 6.1675 (6.1257)    Prec@1 80.469 (83.543)  Prec@5 95.312 (95.817)
-Test: [40/196]  Time 0.889 (1.024)      Loss 6.1888 (6.1483)    Prec@1 81.250 (82.012)  Prec@5 96.875 (95.770)
-Test: [50/196]  Time 0.164 (0.970)      Loss 6.0900 (6.1520)    Prec@1 88.281 (81.794)  Prec@5 97.656 (95.956)
-Test: [60/196]  Time 0.380 (0.933)      Loss 6.1949 (6.1566)    Prec@1 76.172 (81.416)  Prec@5 93.359 (95.946)
-Test: [70/196]  Time 0.427 (0.916)      Loss 6.2009 (6.1525)    Prec@1 78.516 (81.679)  Prec@5 96.484 (96.099)
-Test: [80/196]  Time 0.910 (0.900)      Loss 6.3763 (6.1584)    Prec@1 60.938 (81.134)  Prec@5 88.672 (95.751)
-Test: [90/196]  Time 1.035 (0.896)      Loss 6.4143 (6.1703)    Prec@1 55.078 (80.039)  Prec@5 86.328 (95.175)
-Test: [100/196] Time 0.162 (0.871)      Loss 6.3073 (6.1831)    Prec@1 68.359 (78.968)  Prec@5 91.406 (94.609)
-Test: [110/196] Time 0.658 (0.867)      Loss 6.1750 (6.1885)    Prec@1 76.953 (78.442)  Prec@5 94.922 (94.327)
-Test: [120/196] Time 0.165 (0.861)      Loss 6.2904 (6.1919)    Prec@1 71.094 (78.141)  Prec@5 88.281 (94.034)
-Test: [130/196] Time 1.751 (0.858)      Loss 6.1702 (6.2008)    Prec@1 81.250 (77.290)  Prec@5 94.141 (93.702)
-Test: [140/196] Time 0.163 (0.849)      Loss 6.2442 (6.2045)    Prec@1 75.000 (76.948)  Prec@5 90.625 (93.448)
-Test: [150/196] Time 2.031 (0.846)      Loss 6.1890 (6.2082)    Prec@1 76.953 (76.604)  Prec@5 91.016 (93.189)
-Test: [160/196] Time 0.161 (0.837)      Loss 6.1399 (6.2109)    Prec@1 86.719 (76.366)  Prec@5 94.531 (92.998)
-Test: [170/196] Time 1.687 (0.835)      Loss 6.1388 (6.2159)    Prec@1 82.812 (75.959)  Prec@5 97.656 (92.848)
-Test: [180/196] Time 1.185 (0.828)      Loss 6.3454 (6.2198)    Prec@1 68.750 (75.650)  Prec@5 91.797 (92.705)
-Test: [190/196] Time 1.367 (0.826)      Loss 6.3394 (6.2196)    Prec@1 67.188 (75.685)  Prec@5 95.703 (92.752)
- * Prec@1 75.794 Prec@5 92.798
+1. python darknet2caffe.py cfg/resnet50.cfg resnet50.weights resnet50-darknet2caffe.prototxt resnet50-darknet2caffe.caffemodel
+2. 
 ```
-imagenet data is processed [as described here](https://github.com/facebook/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset)
 ---
 # Convert darknet to caffe
 ### convert tiny-yolo from darknet to caffe
