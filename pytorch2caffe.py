@@ -60,6 +60,8 @@ def pytorch2caffe(input_var, output_var, protofile, caffemodel):
             elif parent_type == 'BatchNormBackward':
                 running_mean = func.running_mean
                 running_var = func.running_var
+                #print('%s running_mean' % parent_name, running_mean)
+                #exit(0)
                 scale_weights = func.next_functions[1][0].variable.data
                 scale_biases = func.next_functions[2][0].variable.data
                 bn_name = parent_name + "_bn"
@@ -218,10 +220,9 @@ if __name__ == '__main__':
     from visualize import make_dot
 
     m = torchvision.models.resnet50(pretrained=True)
+    m.eval() # very important here, otherwise batchnorm running_mean, running_var will be incorrect
     input_var = Variable(torch.rand(1, 3, 224, 224))
 
-    #m = torchvision.models.alexnet(pretrained=True)
-    #input_var = Variable(torch.rand(1, 3, 227, 227))
     print(m)
     output_var = m(input_var)
     fp = open("out.dot", "w")
