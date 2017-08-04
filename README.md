@@ -62,6 +62,35 @@ Test: [170/196] Time 0.688 (0.842)      Loss 0.6132 (0.9542)    Prec@1 82.422 (7
 Test: [180/196] Time 0.244 (0.839)      Loss 1.2884 (0.9700)    Prec@1 69.531 (75.930)  Prec@5 92.969 (92.872)
 Test: [190/196] Time 0.383 (0.834)      Loss 1.1864 (0.9686)    Prec@1 67.188 (75.920)  Prec@5 94.922 (92.899)
  * Prec@1 76.022 Prec@5 92.934
+4. python caffe2darknet.py resnet50-pytorch2caffe.prototxt resnet50-pytorch2caffe.caffemodel resnet50-caffe2darknet.cfg resnet50-caffe2darknet.weights
+5. python main.py -a resnet50-caffe2darknet --pretrained -e /home/xiaohang/ImageNet/        
+=> using pre-trained model 'resnet50-caffe2darknet'
+load weights from resnet50-caffe2darknet.weights
+/home/temp/pytorch-caffe-darknet-convert/cfg.py:199: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
+  conv_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w])); start = start + num_w
+/home/temp/pytorch-caffe-darknet-convert/cfg.py:234: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
+  fc_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w]));   start = start + num_w
+Test: [0/196]   Time 15.418 (15.418)    Loss 0.4863 (0.4863)    Prec@1 85.938 (85.938)  Prec@5 97.656 (97.656)
+Test: [10/196]  Time 0.393 (1.760)      Loss 0.9623 (0.6718)    Prec@1 76.562 (82.919)  Prec@5 93.359 (95.561)
+Test: [20/196]  Time 0.264 (1.241)      Loss 0.7586 (0.6859)    Prec@1 86.328 (82.738)  Prec@5 92.578 (95.424)
+Test: [30/196]  Time 0.160 (1.123)      Loss 0.7881 (0.6409)    Prec@1 80.469 (84.073)  Prec@5 95.312 (95.804)
+Test: [40/196]  Time 0.789 (1.020)      Loss 0.6530 (0.6863)    Prec@1 82.812 (82.336)  Prec@5 96.484 (95.798)
+Test: [50/196]  Time 0.354 (0.983)      Loss 0.4764 (0.6844)    Prec@1 89.062 (82.207)  Prec@5 97.266 (95.910)
+Test: [60/196]  Time 0.458 (0.946)      Loss 0.9198 (0.6984)    Prec@1 76.172 (81.807)  Prec@5 95.312 (95.959)
+Test: [70/196]  Time 0.848 (0.936)      Loss 0.7103 (0.6851)    Prec@1 78.516 (82.042)  Prec@5 96.094 (96.072)
+Test: [80/196]  Time 0.993 (0.918)      Loss 1.4683 (0.7112)    Prec@1 62.109 (81.520)  Prec@5 88.672 (95.737)
+Test: [90/196]  Time 1.750 (0.911)      Loss 1.8474 (0.7593)    Prec@1 57.031 (80.460)  Prec@5 86.719 (95.261)
+Test: [100/196] Time 0.160 (0.889)      Loss 1.1329 (0.8115)    Prec@1 68.359 (79.297)  Prec@5 91.797 (94.694)
+Test: [110/196] Time 1.261 (0.883)      Loss 0.8606 (0.8358)    Prec@1 77.734 (78.790)  Prec@5 93.750 (94.457)
+Test: [120/196] Time 0.667 (0.874)      Loss 1.2403 (0.8538)    Prec@1 69.922 (78.483)  Prec@5 87.500 (94.150)
+Test: [130/196] Time 1.216 (0.867)      Loss 0.7038 (0.8877)    Prec@1 80.469 (77.612)  Prec@5 96.484 (93.831)
+Test: [140/196] Time 0.166 (0.857)      Loss 1.0392 (0.9057)    Prec@1 74.609 (77.263)  Prec@5 91.797 (93.628)
+Test: [150/196] Time 1.123 (0.850)      Loss 1.0445 (0.9234)    Prec@1 75.781 (76.930)  Prec@5 90.234 (93.385)
+Test: [160/196] Time 0.161 (0.845)      Loss 0.6993 (0.9374)    Prec@1 86.328 (76.672)  Prec@5 94.141 (93.180)
+Test: [170/196] Time 0.345 (0.837)      Loss 0.6132 (0.9542)    Prec@1 82.422 (76.263)  Prec@5 97.656 (93.012)
+Test: [180/196] Time 1.152 (0.839)      Loss 1.2884 (0.9700)    Prec@1 69.531 (75.930)  Prec@5 92.969 (92.872)
+Test: [190/196] Time 0.165 (0.829)      Loss 1.1864 (0.9686)    Prec@1 67.188 (75.920)  Prec@5 94.922 (92.899)
+ * Prec@1 76.022 Prec@5 92.934
 ```
 imagenet data is processed [as described here](https://github.com/facebook/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset)
 

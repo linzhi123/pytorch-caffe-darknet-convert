@@ -103,6 +103,10 @@ def caffe2darknet(protofile, caffemodel):
                 block['type'] = 'maxpool'
                 block['size'] = layer['pooling_param']['kernel_size']
                 block['stride'] = layer['pooling_param']['stride']
+                if layer['pooling_param'].has_key('pad'):
+                    pad = int(layer['pooling_param']['pad'])
+                    if pad > 0:
+                        block['pad'] = '1'
             top = layer['top']
             layer_id[top] = len(blocks)
             blocks.append(block)
