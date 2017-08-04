@@ -5,6 +5,7 @@ from collections import OrderedDict
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
+import numpy as np
 from torch.autograd import Variable
 from prototxt import *
 
@@ -86,6 +87,7 @@ def save_fc2caffe(weights, biases, fc_param):
 def save_bn2caffe(running_mean, running_var, bn_param):
     bn_param[0].data[...] = running_mean.numpy()
     bn_param[1].data[...] = running_var.numpy()
+    bn_param[2].data[...] = np.array([1.0])
 
 def save_scale2caffe(weights, biases, scale_param):
     scale_param[1].data[...] = biases.numpy()
@@ -143,6 +145,8 @@ def pytorch2prototxt(input_var, output_var):
             conv_param['pad'] = func.padding[0]
             conv_param['kernel_size'] = weights.size(2)
             conv_param['stride'] = func.stride[0]
+            if func.next_functions[2][0] == None:
+                conv_param['bias_term'] = 'false'
             layer['convolution_param'] = conv_param
         elif parent_type == 'BatchNormBackward':
             bn_layer = OrderedDict()
@@ -225,4 +229,4 @@ if __name__ == '__main__':
     fp.close()
     #exit(0)
 
-    pytorch2caffe(input_var, output_var, 'out.prototxt', 'out.caffemodel')
+    pytorch2caffe(input_var, output_var, 'resnet50-pytorch2caffe.prototxt', 'resnet50-pytorch2caffe.caffemodel')

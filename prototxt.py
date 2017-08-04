@@ -104,7 +104,7 @@ def print_prototxt(net_info):
         #if str.isnumeric():
         if is_number(value):
             return value
-        elif value == 'true' or value == 'false' or value == 'MAX':
+        elif value == 'true' or value == 'false' or value == 'MAX' or value == 'SUM' or value == 'AVE':
             return value
         else:
             return '\"%s\"' % value
@@ -142,7 +142,7 @@ def save_prototxt(net_info, protofile, region=True):
         #if str.isnumeric():
         if is_number(value):
             return value
-        elif value == 'true' or value == 'false' or value == 'MAX':
+        elif value == 'true' or value == 'false' or value == 'MAX' or value == 'SUM' or value == 'AVE':
             return value
         else:
             return '\"%s\"' % value
