@@ -201,6 +201,8 @@ def cfg2prototxt(cfgfile):
             pooling_param['kernel_size'] = block['size']
             pooling_param['stride'] = block['stride']
             pooling_param['pool'] = 'MAX'
+            if block.has_key('pad') and int(block['pad']) == 1:
+                pooling_param['pad'] = str((int(block['size'])-1)/2)
             max_layer['pooling_param'] = pooling_param
             layers.append(max_layer)
             bottom = max_layer['top']

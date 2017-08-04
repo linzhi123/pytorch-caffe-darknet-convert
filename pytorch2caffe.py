@@ -175,7 +175,7 @@ def pytorch2prototxt(input_var, output_var):
             pooling_param['pool'] = 'MAX'
             pooling_param['kernel_size'] = func.kernel_size[0]
             pooling_param['stride'] = func.stride[0]
-            #pooling_param['pad'] = func.padding[0]
+            pooling_param['pad'] = func.padding[0]
             layer['pooling_param']  = pooling_param
         elif parent_type == 'AvgPool2dBackward':
             pooling_param = OrderedDict()

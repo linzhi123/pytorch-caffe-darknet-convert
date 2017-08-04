@@ -231,6 +231,9 @@ class CaffeNet(nn.Module):
             elif ltype == 'Pooling':
                 kernel_size = int(layer['pooling_param']['kernel_size'])
                 stride = int(layer['pooling_param']['stride'])
+                padding = 0
+                if layer['pooling_param'].has_key('pad'):
+                    padding = int(layer['pooling_param']['pad'])
                 pool_type = layer['pooling_param']['pool']
                 if pool_type == 'MAX' and kernel_size == 2 and stride == 1: # for tiny-yolo-voc
                     models[lname] = MaxPoolStride1()
@@ -238,9 +241,9 @@ class CaffeNet(nn.Module):
                     blob_height[tname] = blob_height[bname]
                 else:
                     if pool_type == 'MAX':
-                        models[lname] = nn.MaxPool2d(kernel_size, stride)
+                        models[lname] = nn.MaxPool2d(kernel_size, stride, padding=padding)
                     elif pool_type == 'AVE':
-                        models[lname] = nn.AvgPool2d(kernel_size, stride)
+                        models[lname] = nn.AvgPool2d(kernel_size, stride, padding=padding)
 
                     if stride > 1:
                         blob_width[tname] = (blob_width[bname] - kernel_size + 1)/stride + 1
