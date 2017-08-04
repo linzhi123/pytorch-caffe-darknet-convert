@@ -37,10 +37,6 @@ Test: [190/196] Time 1.609 (0.821)      Loss 1.1864 (0.9686)    Prec@1 67.188 (7
 => using pre-trained model 'resnet50-pytorch2caffe'
 load weights resnet50-pytorch2caffe.caffemodel
 Loading caffemodel:  resnet50-pytorch2caffe.caffemodel
-/home/temp/pytorch-caffe-darknet-convert/caffenet.py:135: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
-  self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
-/home/temp/pytorch-caffe-darknet-convert/caffenet.py:149: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
-  self.models[lname][1].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
 Test: [0/196]   Time 14.528 (14.528)    Loss 0.4863 (0.4863)    Prec@1 85.938 (85.938)  Prec@5 97.656 (97.656)
 Test: [10/196]  Time 0.356 (1.678)      Loss 0.9623 (0.6718)    Prec@1 76.562 (82.919)  Prec@5 93.359 (95.561)
 Test: [20/196]  Time 0.183 (1.206)      Loss 0.7586 (0.6859)    Prec@1 86.328 (82.738)  Prec@5 92.578 (95.424)
@@ -66,10 +62,6 @@ Test: [190/196] Time 0.383 (0.834)      Loss 1.1864 (0.9686)    Prec@1 67.188 (7
 5. python main.py -a resnet50-caffe2darknet --pretrained -e /home/xiaohang/ImageNet/        
 => using pre-trained model 'resnet50-caffe2darknet'
 load weights from resnet50-caffe2darknet.weights
-/home/temp/pytorch-caffe-darknet-convert/cfg.py:199: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
-  conv_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w])); start = start + num_w
-/home/temp/pytorch-caffe-darknet-convert/cfg.py:234: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
-  fc_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w]));   start = start + num_w
 Test: [0/196]   Time 15.418 (15.418)    Loss 0.4863 (0.4863)    Prec@1 85.938 (85.938)  Prec@5 97.656 (97.656)
 Test: [10/196]  Time 0.393 (1.760)      Loss 0.9623 (0.6718)    Prec@1 76.562 (82.919)  Prec@5 93.359 (95.561)
 Test: [20/196]  Time 0.264 (1.241)      Loss 0.7586 (0.6859)    Prec@1 86.328 (82.738)  Prec@5 92.578 (95.424)
@@ -101,10 +93,6 @@ imagenet data is processed [as described here](https://github.com/facebook/fb.re
 2. python main.py -a resnet50-darknet --pretrained -e /home/xiaohang/ImageNet/
 => using pre-trained model 'resnet50-darknet'
 load weights from resnet50.weights
-/home/temp/pytorch-caffe-darknet-convert/cfg.py:199: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
-  conv_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w])); start = start + num_w
-/home/temp/pytorch-caffe-darknet-convert/cfg.py:234: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
-  fc_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w]));   start = start + num_w
 Test: [0/196]   Time 15.029 (15.029)    Loss 6.0965 (6.0965)    Prec@1 85.938 (85.938)  Prec@5 97.656 (97.656)
 Test: [10/196]  Time 0.380 (1.716)      Loss 6.2165 (6.1346)    Prec@1 76.562 (82.919)  Prec@5 93.359 (95.561)
 Test: [20/196]  Time 0.167 (1.205)      Loss 6.0981 (6.1388)    Prec@1 86.328 (82.738)  Prec@5 92.578 (95.424)
@@ -131,10 +119,6 @@ Test: [190/196] Time 1.622 (0.827)      Loss 6.3392 (6.2167)    Prec@1 67.188 (7
 => using pre-trained model 'resnet50-darknet2caffe'
 load weights resnet50-darknet2caffe.caffemodel
 Loading caffemodel:  resnet50-darknet2caffe.caffemodel
-/home/temp/pytorch-caffe-darknet-convert/caffenet.py:135: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
-  self.models[lname].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
-/home/temp/pytorch-caffe-darknet-convert/caffenet.py:149: UserWarning: src is not broadcastable to dst, but they have the same number of elements.  Falling back to deprecated pointwise behavior.
-  self.models[lname][1].weight.data.copy_(torch.from_numpy(np.array(lmap[lname].blobs[0].data)))
 Test: [0/196]   Time 14.646 (14.646)    Loss 0.4863 (0.4863)    Prec@1 85.938 (85.938)  Prec@5 97.656 (97.656)
 Test: [10/196]  Time 0.395 (1.705)      Loss 0.9623 (0.6718)    Prec@1 76.562 (82.919)  Prec@5 93.359 (95.561)
 Test: [20/196]  Time 0.343 (1.213)      Loss 0.7586 (0.6859)    Prec@1 86.328 (82.738)  Prec@5 92.578 (95.424)
