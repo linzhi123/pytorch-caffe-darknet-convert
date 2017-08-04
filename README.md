@@ -105,12 +105,6 @@ Test: [190/196] Time 0.680 (0.844)      Loss 1.1804 (1.0279)    Prec@1 65.234 (7
 ```
 Note: the result is slightly different from the result above, still checking ...
 
-
-### convert resnet50 from darknet to caffe
-```
-1. python darknet2caffe.py cfg/resnet50.cfg resnet50.weights resnet50-darknet2caffe.prototxt resnet50-darknet2caffe.caffemodel
-2. 
-```
 ---
 # Convert darknet to caffe
 ### convert tiny-yolo from darknet to caffe
