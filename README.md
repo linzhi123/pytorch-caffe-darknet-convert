@@ -103,7 +103,7 @@ Test: [180/196] Time 0.225 (0.847)      Loss 1.3284 (1.0293)    Prec@1 66.797 (7
 Test: [190/196] Time 0.680 (0.844)      Loss 1.1804 (1.0279)    Prec@1 65.234 (74.493)  Prec@5 94.531 (92.085)
  * Prec@1 74.632 Prec@5 92.144
 ```
-Note: the result is slightly different from the result below, still checking ...
+Note: the result is slightly different from the result above, still checking ...
 
 
 ### convert resnet50 from darknet to caffe
