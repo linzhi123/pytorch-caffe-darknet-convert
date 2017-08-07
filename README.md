@@ -84,7 +84,9 @@ Test: [180/196] Time 1.152 (0.839)      Loss 1.2884 (0.9700)    Prec@1 69.531 (7
 Test: [190/196] Time 0.165 (0.829)      Loss 1.1864 (0.9686)    Prec@1 67.188 (75.920)  Prec@5 94.922 (92.899)
  * Prec@1 76.022 Prec@5 92.934
 ```
-imagenet data is processed [as described here](https://github.com/facebook/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset)
+Note:
+1. imagenet data is processed [as described here](https://github.com/facebook/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset)
+2. to make pytorch2caffe.py work, you need to change the ceil function in pooling to floor
 
 # Convert pytorch -> darknet -> caffe
 ### convert resnet50 from pytorch to darknet and then to caffe
