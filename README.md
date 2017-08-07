@@ -86,7 +86,7 @@ Test: [190/196] Time 0.165 (0.829)      Loss 1.1864 (0.9686)    Prec@1 67.188 (7
 ```
 Note:
 1. imagenet data is processed [as described here](https://github.com/facebook/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset)
-2. to make pytorch2caffe.py work, you need to change the ceil function in pooling to floor
+2. to make pytorch2caffe.py work, you need to change the ceil function in caffe's pooling layer to floor
 
 # Convert pytorch -> darknet -> caffe
 ### convert resnet50 from pytorch to darknet and then to caffe
