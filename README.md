@@ -1,5 +1,6 @@
 # pytorch-caffe-darknet-convert
-Convert between pytorch, caffe and darknet models. Caffe darknet models can be load directly by pytorch. This repository is special designed for [pytorch-yolo2](https://github.com/marvis/pytorch-yolo2) to convert pytorch trained model to any platform.
+This repository is specially designed for [pytorch-yolo2](https://github.com/marvis/pytorch-yolo2) to convert pytorch trained model to any platform. It can also be used as a common model converter between pytorch, caffe and darknet.
+
 - [x] darknet2pytorch : use darknet.py to load darknet model directly
 - [x] caffe2pytorch   : use caffenet.py to load caffe model directly
 - [x] darknet2caffe
