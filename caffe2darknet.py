@@ -169,11 +169,17 @@ def prototxt2cfg(protofile):
 
     blocks = []
     block = OrderedDict()
-    block['type'] = 'net'
-    block['batch'] = props['input_dim'][0]
-    block['channels'] = props['input_dim'][1]
-    block['height'] = props['input_dim'][2]
-    block['width'] = props['input_dim'][3]
+    block['type'] = 'net' 
+    if props.has_key('input_shape'): 
+        block['batch'] = props['input_shape']['dim'][0]
+        block['channels'] = props['input_shape']['dim'][1]
+        block['height'] = props['input_shape']['dim'][2]
+        block['width'] = props['input_shape']['dim'][3]
+    else:
+        block['batch'] = props['input_dim'][0]
+        block['channels'] = props['input_dim'][1]
+        block['height'] = props['input_dim'][2]
+        block['width'] = props['input_dim'][3]
     if props.has_key('mean_file'):
         block['mean_file'] = props['mean_file']
     blocks.append(block)
@@ -185,37 +191,44 @@ def prototxt2cfg(protofile):
     layer_id[props['input']] = 0
     while i < layer_num:
         layer = layers[i]
+        print i,layer['name'], layer['type']
         if layer['type'] == 'Convolution':
             if layer_id[layer['bottom']] != len(blocks)-1:
                 block = OrderedDict()
                 block['type'] = 'route'
                 block['layers'] = str(layer_id[layer['bottom']] - len(blocks))
                 blocks.append(block)
-            assert(i+1 < layer_num and layers[i+1]['type'] == 'BatchNorm')
-            assert(i+2 < layer_num and layers[i+2]['type'] == 'Scale')
             conv_layer = layers[i]
-            bn_layer = layers[i+1]
-            scale_layer = layers[i+2]
             block = OrderedDict()
             block['type'] = 'convolutional'
-            block['batch_normalize'] = '1'
             block['filters'] = conv_layer['convolution_param']['num_output']
             block['size'] = conv_layer['convolution_param']['kernel_size']
             block['stride'] = conv_layer['convolution_param']['stride']
             block['pad'] = '1'
-            if i+3 < layer_num and layers[i+3]['type'] == 'ReLU':
-                act_layer = layers[i+3]
+            last_layer = conv_layer 
+            if i+2 < layer_num and layers[i+1]['type'] == 'BatchNorm' and layers[i+2]['type'] == 'Scale':
+                print i+1,layers[i+1]['name'], layers[i+1]['type']
+                print i+2,layers[i+2]['name'], layers[i+2]['type']
+                block['batch_normalize'] = '1'
+                bn_layer = layers[i+1]
+                scale_layer = layers[i+2]
+                last_layer = scale_layer
+                i = i + 2
+            
+            if i+1 < layer_num and layers[i+1]['type'] == 'ReLU':
+                print i+1,layers[i+1]['name'], layers[i+1]['type']
+                act_layer = layers[i+1]
                 block['activation'] = 'relu'
                 top = act_layer['top']
                 layer_id[top] = len(blocks)
                 blocks.append(block)
-                i = i + 4
+                i = i + 1
             else:
                 block['activation'] = 'linear'
-                top = scale_layer['top']
+                top = last_layer['top']
                 layer_id[top] = len(blocks)
                 blocks.append(block)
-                i = i + 3
+            i = i + 1
         elif layer['type'] == 'Pooling':
             assert(layer_id[layer['bottom']] == len(blocks)-1)
             block = OrderedDict()
@@ -225,6 +238,10 @@ def prototxt2cfg(protofile):
                 block['type'] = 'maxpool'
                 block['size'] = layer['pooling_param']['kernel_size']
                 block['stride'] = layer['pooling_param']['stride']
+                if layer['pooling_param'].has_key('pad'):
+                    pad = int(layer['pooling_param']['pad'])
+                    if pad > 0:
+                        block['pad'] = '1'
             top = layer['top']
             layer_id[top] = len(blocks)
             blocks.append(block)
@@ -240,7 +257,7 @@ def prototxt2cfg(protofile):
             block['from'] = str(from_id)
             assert(i+1 < layer_num and layers[i+1]['type'] == 'ReLU')
             block['activation'] = 'relu'
-            top = layer['top']
+            top = layers[i+1]['top']
             layer_id[top] = len(blocks)
             blocks.append(block)
             i = i + 2
@@ -274,7 +291,10 @@ def prototxt2cfg(protofile):
         else:
             print('unknown type %s' % layer['type'])
             i = i + 1
+
+    print 'done' 
     return blocks
+
 
 def save_weights(data, weightfile):
     print 'Save to ', weightfile
