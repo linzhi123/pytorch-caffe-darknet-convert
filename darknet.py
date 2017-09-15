@@ -149,10 +149,12 @@ class Darknet(nn.Module):
         out_width =[]
         out_height =[]
         conv_id = 0
+        prev_width = 0
+        prev_height = 0
         for block in blocks:
             if block['type'] == 'net':
                 prev_filters = int(block['channels'])
-                prev_weight = int(block['width'])
+                prev_width = int(block['width'])
                 prev_height = int(block['height'])
                 continue
             elif block['type'] == 'convolutional':
@@ -266,7 +268,8 @@ class Darknet(nn.Module):
                 out_height.append(prev_height)
                 models.append(EmptyModule())
             elif block['type'] == 'connected':
-                filters = int(block['output']) * prev_width * prev_height
+                prev_filters = prev_filters * prev_width * prev_height
+                filters = int(block['output'])
                 is_first = (prev_width * prev_height != 1)
                 if block['activation'] == 'linear':
                     if is_first:
