@@ -5,6 +5,17 @@ from torch.autograd import Variable
 import numpy as np
 from cfg import *
 
+class FCView(nn.Module):
+    def __init__(self):
+        super(FCView, self).__init__()
+
+    def forward(self, x):
+        nB = x.data.size(0)
+        x = x.view(nB,-1)
+        return x
+    def __repr__(self):
+        return 'view(nB, -1)'
+
 class MaxPoolStride1(nn.Module):
     def __init__(self):
         super(MaxPoolStride1, self).__init__()
@@ -135,10 +146,14 @@ class Darknet(nn.Module):
     
         prev_filters = 3
         out_filters =[]
+        out_width =[]
+        out_height =[]
         conv_id = 0
         for block in blocks:
             if block['type'] == 'net':
                 prev_filters = int(block['channels'])
+                prev_weight = int(block['width'])
+                prev_height = int(block['height'])
                 continue
             elif block['type'] == 'convolutional':
                 conv_id = conv_id + 1
@@ -160,7 +175,11 @@ class Darknet(nn.Module):
                 elif activation == 'relu':
                     model.add_module('relu{0}'.format(conv_id), nn.ReLU(inplace=True))
                 prev_filters = filters
+                prev_width = (prev_width + 2*pad - kernel_size)/stride + 1
+                prev_height = (prev_height + 2*pad - kernel_size)/stride + 1
                 out_filters.append(prev_filters)
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(model)
             elif block['type'] == 'maxpool':
                 pool_size = int(block['size'])
@@ -173,14 +192,30 @@ class Darknet(nn.Module):
                 else:
                     model = MaxPoolStride1()
                 out_filters.append(prev_filters)
+                if stride > 1:
+                    prev_width = (prev_width - kernel_size + 1)/stride + 1
+                    prev_height = (prev_height - kernel_size + 1)/stride + 1
+                else:
+                    prev_width = prev_width - kernel_size + 1
+                    prev_height = prev_height - kernel_size + 1
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(model)
             elif block['type'] == 'avgpool':
                 model = GlobalAvgPool2d()
                 out_filters.append(prev_filters)
+                prev_width = 1
+                prev_height = 1
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(model)
             elif block['type'] == 'softmax':
                 model = nn.Softmax()
+                prev_width = 1
+                prev_height = 1
                 out_filters.append(prev_filters)
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(model)
             elif block['type'] == 'cost':
                 if block['_type'] == 'sse':
@@ -189,12 +224,20 @@ class Darknet(nn.Module):
                     model = nn.L1Loss(size_average=True)
                 elif block['_type'] == 'smooth':
                     model = nn.SmoothL1Loss(size_average=True)
+                prev_width = 1
+                prev_height = 1
                 out_filters.append(1)
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(model)
             elif block['type'] == 'reorg':
                 stride = int(block['stride'])
                 prev_filters = stride * stride * prev_filters
+                prev_width = prev_width / stride
+                prev_height = prev_height / stride
                 out_filters.append(prev_filters)
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(Reorg(stride))
             elif block['type'] == 'route':
                 layers = block['layers'].split(',')
@@ -202,30 +245,60 @@ class Darknet(nn.Module):
                 layers = [int(i) if int(i) > 0 else int(i)+ind for i in layers]
                 if len(layers) == 1:
                     prev_filters = out_filters[layers[0]]
+                    prev_width = out_width[layers[0]]
+                    prev_height = out_height[layers[0]]
                 elif len(layers) == 2:
                     assert(layers[0] == ind - 1)
                     prev_filters = out_filters[layers[0]] + out_filters[layers[1]]
+                    prev_width = out_width[layers[0]]
+                    prev_height = out_height[layers[0]]
                 out_filters.append(prev_filters)
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(EmptyModule())
             elif block['type'] == 'shortcut':
                 ind = len(models)
                 prev_filters = out_filters[ind-1]
+                prev_width = out_width[ind-1]
+                prev_height = out_height[ind-1]
                 out_filters.append(prev_filters)
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(EmptyModule())
             elif block['type'] == 'connected':
-                filters = int(block['output'])
+                filters = int(block['output']) * prev_width * prev_height
+                is_first = (prev_width * prev_height != 1)
                 if block['activation'] == 'linear':
-                    model = nn.Linear(prev_filters, filters)
+                    if is_first:
+                        model = nn.Sequential(FCView(), nn.Linear(prev_filters, filters))
+                    else:
+                        model = nn.Linear(prev_filters, filters)
                 elif block['activation'] == 'leaky':
-                    model = nn.Sequential(
-                               nn.Linear(prev_filters, filters),
-                               nn.LeakyReLU(0.1, inplace=True))
+                    if is_first:
+                        model = nn.Sequential(
+                                   FCView(),
+                                   nn.Linear(prev_filters, filters),
+                                   nn.LeakyReLU(0.1, inplace=True))
+                    else:
+                        model = nn.Sequential(
+                                   nn.Linear(prev_filters, filters),
+                                   nn.LeakyReLU(0.1, inplace=True))
                 elif block['activation'] == 'relu':
-                    model = nn.Sequential(
-                               nn.Linear(prev_filters, filters),
-                               nn.ReLU(inplace=True))
+                    if is_first:
+                        model = nn.Sequential(
+                                   FCView(),
+                                   nn.Linear(prev_filters, filters),
+                                   nn.ReLU(inplace=True))
+                    else:
+                        model = nn.Sequential(
+                                   nn.Linear(prev_filters, filters),
+                                   nn.ReLU(inplace=True))
                 prev_filters = filters
+                prev_width = 1
+                prev_height = 1
                 out_filters.append(prev_filters)
+                out_width.append(prev_width)
+                out_height.append(prev_height)
                 models.append(model)
             elif block['type'] == 'region':
                 continue
@@ -260,6 +333,7 @@ class Darknet(nn.Module):
 
         start = 0
         ind = -2
+        is_first = True;
         for block in self.blocks:
             if start >= buf.size:
                 break
@@ -276,9 +350,17 @@ class Darknet(nn.Module):
             elif block['type'] == 'connected':
                 model = self.models[ind]
                 if block['activation'] != 'linear':
-                    start = load_fc(buf, start, model[0])
+                    if is_first:
+                        start = load_fc(buf, start, model[1])
+                        is_first = False;
+                    else:
+                        start = load_fc(buf, start, model[0])
                 else:
-                    start = load_fc(buf, start, model)
+                    if is_first:
+                        start = load_fc(buf, start, model[1])
+                        is_first = False;
+                    else:
+                        start = load_fc(buf, start, model)
             elif block['type'] == 'maxpool':
                 pass
             elif block['type'] == 'reorg':
@@ -308,6 +390,7 @@ class Darknet(nn.Module):
         header.numpy().tofile(fp)
 
         ind = -1
+        is_first = True;
         for blockId in range(1, cutoff+1):
             ind = ind + 1
             block = self.blocks[blockId]
@@ -321,9 +404,17 @@ class Darknet(nn.Module):
             elif block['type'] == 'connected':
                 model = self.models[ind]
                 if block['activation'] == 'linear':
-                    save_fc(fp, model)
+                    if is_first:
+                        save_fc(fp, model[1])
+                        is_first = False
+                    else:
+                        save_fc(fp, model)
                 else:
-                    save_fc(fp, model[0])
+                    if is_first:
+                        save_fc(fp, model[1])
+                        is_first = False;
+                    else:
+                        save_fc(fp, model[0])
             elif block['type'] == 'maxpool':
                 pass
             elif block['type'] == 'reorg':
@@ -355,6 +446,7 @@ class Darknet(nn.Module):
         header.numpy().tofile(fp)
 
         ind = -1
+        is_first = True
         for blockId in range(1, cutoff+1):
             ind = ind + 1
             block = self.blocks[blockId]
@@ -368,9 +460,17 @@ class Darknet(nn.Module):
             elif block['type'] == 'connected':
                 model = self.models[ind]
                 if block['activation'] == 'linear':
-                    save_fc(fp, model)
+                    if is_first:
+                        save_fc(fp, model[1])
+                        is_first = False
+                    else:
+                        save_fc(fp, model)
                 else:
-                    save_fc(fp, model[0])
+                    if is_first:
+                        save_fc(fp, model[1])
+                        is_first = False
+                    else:
+                        save_fc(fp, model[0])
             elif block['type'] == 'maxpool':
                 pass
             elif block['type'] == 'reorg':
