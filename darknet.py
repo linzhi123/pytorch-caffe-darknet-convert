@@ -104,7 +104,7 @@ class Darknet(nn.Module):
 
             if block['type'] == 'net':
                 continue
-            elif block['type'] == 'convolutional' or block['type'] == 'maxpool' or block['type'] == 'reorg' or block['type'] == 'avgpool' or block['type'] == 'softmax' or block['type'] == 'connected':
+            elif block['type'] == 'convolutional' or block['type'] == 'maxpool' or block['type'] == 'reorg' or block['type'] == 'avgpool' or block['type'] == 'softmax' or block['type'] == 'connected' or block['type'] == 'dropout':
                 x = self.models[ind](x)
                 outputs[ind] = x
             elif block['type'] == 'route':
@@ -267,6 +267,16 @@ class Darknet(nn.Module):
                 out_width.append(prev_width)
                 out_height.append(prev_height)
                 models.append(EmptyModule())
+            elif block['type'] == 'dropout':
+                ind = len(models)
+                ratio = float(block['probability'])
+                prev_filters = out_filters[ind-1]
+                prev_width = out_width[ind-1]
+                prev_height = out_height[ind-1]
+                out_filters.append(prev_filters)
+                out_width.append(prev_width)
+                out_height.append(prev_height)
+                models.append(nn.Dropout2d(ratio))
             elif block['type'] == 'connected':
                 prev_filters = prev_filters * prev_width * prev_height
                 filters = int(block['output'])
@@ -380,6 +390,8 @@ class Darknet(nn.Module):
                 pass
             elif block['type'] == 'region':
                 pass
+            elif block['type'] == 'dropout':
+                pass
             else:
                 print('unknown type %s' % (block['type']))
 
@@ -433,6 +445,8 @@ class Darknet(nn.Module):
             elif block['type'] == 'cost':
                 pass
             elif block['type'] == 'region':
+                pass
+            elif block['type'] == 'dropout':
                 pass
             else:
                 print('unknown type %s' % (block['type']))
@@ -489,6 +503,8 @@ class Darknet(nn.Module):
             elif block['type'] == 'cost':
                 pass
             elif block['type'] == 'region':
+                pass
+            elif block['type'] == 'dropout':
                 pass
             else:
                 print('unknown type %s' % (block['type']))
