@@ -211,3 +211,5 @@ Mean AP = 0.5391
 5. python detect.py tiny-yolo-voc-nobn.prototxt tiny-yolo-voc-nobn.caffemodel data/dog.jpg 
 ```
 
+#### License
+MIT License (see LICENSE file).
