@@ -158,6 +158,17 @@ def caffe2darknet(protofile, caffemodel):
             i = i + 1
         else:
             print('unknown type %s' % layer['type'])
+            if layer_id[layer['bottom']] != len(blocks)-1:
+                block = OrderedDict()
+                block['type'] = 'route'
+                block['layers'] = str(layer_id[layer['bottom']] - len(blocks))
+                blocks.append(block)
+            block = OrderedDict()
+            block['type'] = layer['type']
+            top = layer['top']
+            layer_id[top] = len(blocks)
+            blocks.append(block)
+
             i = i + 1
 
     print 'done' 
