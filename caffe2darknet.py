@@ -203,7 +203,9 @@ def prototxt2cfg(protofile):
             block['type'] = 'convolutional'
             block['filters'] = conv_layer['convolution_param']['num_output']
             block['size'] = conv_layer['convolution_param']['kernel_size']
-            block['stride'] = conv_layer['convolution_param']['stride']
+            block['stride'] = '1'
+            if conv_layer['convolution_param'].has_key('stride'):
+                block['stride'] = conv_layer['convolution_param']['stride']
             block['pad'] = '1'
             last_layer = conv_layer 
             if i+2 < layer_num and layers[i+1]['type'] == 'BatchNorm' and layers[i+2]['type'] == 'Scale':
@@ -290,6 +292,16 @@ def prototxt2cfg(protofile):
             i = i + 1
         else:
             print('unknown type %s' % layer['type'])
+            if layer_id[layer['bottom']] != len(blocks)-1:
+                block = OrderedDict()
+                block['type'] = 'route'
+                block['layers'] = str(layer_id[layer['bottom']] - len(blocks))
+                blocks.append(block)
+            block = OrderedDict()
+            block['type'] = layer['type']
+            top = layer['top']
+            layer_id[top] = len(blocks)
+            blocks.append(block)
             i = i + 1
 
     print 'done' 
