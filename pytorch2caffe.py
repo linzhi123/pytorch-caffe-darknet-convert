@@ -222,9 +222,13 @@ if __name__ == '__main__':
     import torchvision
     from visualize import make_dot
 
-    #m = torchvision.models.resnet50(pretrained=True)
-    m = torchvision.models.vgg16()
-    m.classifier.add_module('softmax', torch.nn.Softmax())
+    model_name = 'resnet50'
+
+    if model_name == 'resnet50':
+        m = torchvision.models.resnet50(pretrained=True)
+    elif model_name == 'vgg16':
+        m = torchvision.models.vgg16()
+        m.classifier.add_module('softmax', torch.nn.Softmax())
     m.eval() # very important here, otherwise batchnorm running_mean, running_var will be incorrect
     input_var = Variable(torch.rand(1, 3, 224, 224))
 
@@ -236,5 +240,7 @@ if __name__ == '__main__':
     fp.close()
     #exit(0)
 
-    #pytorch2caffe(input_var, output_var, 'resnet50-pytorch2caffe.prototxt', 'resnet50-pytorch2caffe.caffemodel')
-    pytorch2caffe(input_var, output_var, 'vgg16-pytorch2caffe.prototxt', 'vgg16-pytorch2caffe.caffemodel')
+    if model_name == 'resnet50':
+        pytorch2caffe(input_var, output_var, 'resnet50-pytorch2caffe.prototxt', 'resnet50-pytorch2caffe.caffemodel')
+    elif model_name == 'vgg16':
+        pytorch2caffe(input_var, output_var, 'vgg16-pytorch2caffe.prototxt', 'vgg16-pytorch2caffe.caffemodel')

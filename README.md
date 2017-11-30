@@ -7,6 +7,7 @@ This repository is specially designed for [pytorch-yolo2](https://github.com/mar
 - [x] caffe2darknet
 - [x] pytorch2caffe
 - [x] pytorch2darknet : pytorch2caffe then caffe2darknet
+- [x] shrink_bn_caffe : shrink batchnorm and scale layer in caffe model
 
 # Convert pytorch -> caffe -> darknet
 ```
@@ -83,6 +84,29 @@ Test: [160/196] Time 0.161 (0.845)      Loss 0.6993 (0.9374)    Prec@1 86.328 (7
 Test: [170/196] Time 0.345 (0.837)      Loss 0.6132 (0.9542)    Prec@1 82.422 (76.263)  Prec@5 97.656 (93.012)
 Test: [180/196] Time 1.152 (0.839)      Loss 1.2884 (0.9700)    Prec@1 69.531 (75.930)  Prec@5 92.969 (92.872)
 Test: [190/196] Time 0.165 (0.829)      Loss 1.1864 (0.9686)    Prec@1 67.188 (75.920)  Prec@5 94.922 (92.899)
+ * Prec@1 76.022 Prec@5 92.934
+6. python shrink_bn_caffe.py resnet50-pytorch2caffe.prototxt resnet50-pytorch2caffe.caffemodel resnet50-pytorch2caffe.nobn.prototxt resnet50-pytorch2caffe.nobn.caffemodel
+7. python main.py -a resnet50-pytorch2caffe.nobn --pretrained -e /home/xiaohang/ImageNet/
+Test: [0/196]   Time 29.615 (29.615)    Loss 0.4863 (0.4863)    Prec@1 85.938 (85.938)  Prec@5 97.656 (97.656)
+Test: [10/196]  Time 0.470 (3.075)      Loss 0.9623 (0.6718)    Prec@1 76.562 (82.919)  Prec@5 93.359 (95.561)
+Test: [20/196]  Time 0.221 (1.940)      Loss 0.7586 (0.6859)    Prec@1 86.328 (82.738)  Prec@5 92.578 (95.424)
+Test: [30/196]  Time 0.890 (1.617)      Loss 0.7881 (0.6409)    Prec@1 80.469 (84.073)  Prec@5 95.312 (95.804)
+Test: [40/196]  Time 1.176 (1.426)      Loss 0.6530 (0.6863)    Prec@1 82.812 (82.336)  Prec@5 96.484 (95.798)
+Test: [50/196]  Time 1.331 (1.304)      Loss 0.4764 (0.6844)    Prec@1 89.062 (82.207)  Prec@5 97.266 (95.910)
+Test: [60/196]  Time 0.520 (1.223)      Loss 0.9198 (0.6984)    Prec@1 76.172 (81.807)  Prec@5 95.312 (95.959)
+Test: [70/196]  Time 0.397 (1.184)      Loss 0.7103 (0.6851)    Prec@1 78.516 (82.042)  Prec@5 96.094 (96.072)
+Test: [80/196]  Time 0.666 (1.141)      Loss 1.4683 (0.7112)    Prec@1 62.109 (81.520)  Prec@5 88.672 (95.737)
+Test: [90/196]  Time 0.759 (1.121)      Loss 1.8474 (0.7593)    Prec@1 57.031 (80.460)  Prec@5 86.719 (95.261)
+Test: [100/196] Time 0.153 (1.082)      Loss 1.1329 (0.8115)    Prec@1 68.359 (79.297)  Prec@5 91.797 (94.694)
+Test: [110/196] Time 0.511 (1.068)      Loss 0.8606 (0.8358)    Prec@1 77.734 (78.790)  Prec@5 93.750 (94.457)
+Test: [120/196] Time 0.643 (1.057)      Loss 1.2403 (0.8538)    Prec@1 69.922 (78.483)  Prec@5 87.500 (94.150)
+Test: [130/196] Time 1.309 (1.040)      Loss 0.7038 (0.8877)    Prec@1 80.469 (77.612)  Prec@5 96.484 (93.831)
+Test: [140/196] Time 0.261 (1.021)      Loss 1.0392 (0.9057)    Prec@1 74.609 (77.263)  Prec@5 91.797 (93.628)
+Test: [150/196] Time 1.744 (1.013)      Loss 1.0445 (0.9234)    Prec@1 75.781 (76.930)  Prec@5 90.234 (93.385)
+Test: [160/196] Time 0.222 (0.997)      Loss 0.6993 (0.9374)    Prec@1 86.328 (76.672)  Prec@5 94.141 (93.180)
+Test: [170/196] Time 1.306 (0.994)      Loss 0.6132 (0.9542)    Prec@1 82.422 (76.263)  Prec@5 97.656 (93.012)
+Test: [180/196] Time 0.609 (0.978)      Loss 1.2884 (0.9700)    Prec@1 69.531 (75.930)  Prec@5 92.969 (92.872)
+Test: [190/196] Time 0.505 (0.972)      Loss 1.1864 (0.9686)    Prec@1 67.188 (75.920)  Prec@5 94.922 (92.899)
  * Prec@1 76.022 Prec@5 92.934
 ```
 Note:
