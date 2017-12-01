@@ -256,7 +256,6 @@ def generate_nbn_caffemodel(input_prototxt, input_caffemodel, output_prototxt, o
                 output_network.params[layers[i].name][0].data[j] = var[j]*conv_w[j]
             output_network.params[layers[i].name][1].data[...] = conv_b
         else:
-            print layers[i].name
             output_network.params[layers[i].name][0].data[...] = input_network.params[layers[i].name][0].data[...]
             output_network.params[layers[i].name][1].data[...] = input_network.params[layers[i].name][1].data[...]    
 
