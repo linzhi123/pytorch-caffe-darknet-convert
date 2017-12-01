@@ -57,8 +57,6 @@ def generate_nbn_prototxt(input_prototxt, input_caffemodel, output_prototxt):
             bottoms = layer.bottom
             for bottom in bottoms:
                 if layer.type == "ReLU" or layer.type == "Eltwise":
-                    #print "&**********, ", remove_dict
-                    #print bottom
                     if bottom in remove_dict:
                         res.append('bottom: "%s"' % remove_dict[bottom])
                     elif bottom in split_dict: 
@@ -66,8 +64,6 @@ def generate_nbn_prototxt(input_prototxt, input_caffemodel, output_prototxt):
                     else:
                         res.append('bottom: "%s"' % bottom)
                 elif bottom != "label":
-                    print "&**********, ", split_dict
-                    print bottom
                     if bottom in split_dict:
                         res.append('bottom: "%s"' % split_dict[bottom])
                     else:
@@ -223,11 +219,9 @@ def generate_nbn_caffemodel(input_prototxt, input_caffemodel, output_prototxt, o
     output_network = caffe.Net(output_prototxt, caffe.TEST)
 
     for i in range(len(layers)):
-        #print layers[i].type, layers[i].name
         if layers[i].type == "Input" or layers[i].type == "Eltwise" or layers[i].type == "Scale" or layers[i].type == "BatchNorm" or layers[i].type == "ImageData" or layers[i].type == "ReLU" or layers[i].type == "Pooling" or layers[i].type == "Split" or layers[i].type == "Concat" or  layers[i].type == "Flatten" or layers[i].type == "SoftmaxWithLoss":
             continue
         elif layers[i].type == "Convolution":
-            #print "layer_name:", layers[i].name
             if not (layers[i+2].type == "Scale" and layers[i+1].type == "BatchNorm"):
                 continue
             bn_conv = layers[i+1].name
@@ -239,16 +233,12 @@ def generate_nbn_caffemodel(input_prototxt, input_caffemodel, output_prototxt, o
                 conv_b = input_network.params[layers[i].name][1].data[...]
             else:
                 conv_b = np.zeros((conv_w.shape[0],), dtype=np.uint8)
-            #print "conv_w:", conv_w.shape
-            #print "conv_b:", conv_b.shape
 
             # original batchnormal
             scale = input_network.params[bn_conv][2].data[...]
             mean = input_network.params[bn_conv][0].data[...]
             var = input_network.params[bn_conv][1].data[...]
-            #print "sacle:", scale
-            #print "mean:", mean
-            #print "var:", var
+
             # original scale
             scale_w = input_network.params[scale_conv][0].data[...]
             scale_b = input_network.params[scale_conv][1].data[...]
