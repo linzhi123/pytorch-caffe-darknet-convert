@@ -2,7 +2,7 @@
 This repository is specially designed for [pytorch-yolo2](https://github.com/marvis/pytorch-yolo2) to convert pytorch trained model to any platform. It can also be used as a common model converter between pytorch, caffe and darknet.
 
 - [x] darknet2pytorch : use darknet.py to load darknet model directly
-- [x] caffe2pytorch   : use caffenet.py to load caffe model directly
+- [x] [caffe2pytorch](https://github.com/marvis/caffe2pytorch)   : use caffenet.py to load caffe model directly, furthur supports moved to [caffe2pytorch]( https://github.com/marvis/caffe2pytorch)
 - [x] darknet2caffe
 - [x] caffe2darknet
 - [x] pytorch2caffe
